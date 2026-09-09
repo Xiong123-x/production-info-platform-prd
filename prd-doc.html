@@ -83,6 +83,13 @@ a{color:var(--brand);text-decoration:none}
 .side-foot{padding:14px 24px 18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink3);line-height:1.7}
 .side-foot b{color:var(--ink2);font-weight:600}
 
+/* 目录标题 */
+.toc-title{
+  display:flex;align-items:baseline;gap:8px;padding:2px 12px 10px;font-size:13px;font-weight:900;color:var(--ink);
+  letter-spacing:1px;
+}
+.toc-title small{font-size:9.5px;font-weight:600;color:var(--ink3);letter-spacing:2px}
+
 /* 移动端抽屉 */
 .scrim{position:fixed;inset:0;background:rgba(10,26,40,.45);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
 .scrim.show{opacity:1;pointer-events:auto}
@@ -287,6 +294,7 @@ table .sub{color:var(--ink3);font-size:12px}
     </div>
     <nav class="toc-wrap" aria-label="文档目录">
       <ul class="toc" id="toc">
+<div class="toc-title">目录<small>CONTENTS</small></div>
 <li><a href="#preface"><span class="num">00</span>前言</a></li>
 <li><a href="#s1"><span class="num">01</span>版本信息</a></li>
 <li><a href="#s2"><span class="num">02</span>变更日志</a></li>
@@ -294,12 +302,12 @@ table .sub{color:var(--ink3);font-size:12px}
 <li><a href="#s4"><span class="num">04</span>需求背景</a></li>
 <li><a href="#s5"><span class="num">05</span>需求范围</a></li>
 <li><a href="#s6"><span class="num">06</span>功能详细说明</a></li>
-<li><a class="lv2" href="#s61"><span class="num">6.1</span>6.1</a></li>
-<li><a class="lv2" href="#s62"><span class="num">6.2</span>6.2</a></li>
-<li><a class="lv2" href="#s63"><span class="num">6.3</span>6.3</a></li>
-<li><a class="lv2" href="#s66"><span class="num">6.6</span>6.6</a></li>
-<li><a class="lv2" href="#s67"><span class="num">6.7</span>6.7</a></li>
-<li><a class="lv2" href="#s68"><span class="num">6.8</span>6.8</a></li>
+<li><a class="lv2" href="#s61"><span class="num">6.1</span>业务分类管理</a></li>
+<li><a class="lv2" href="#s62"><span class="num">6.2</span>模板管理主页</a></li>
+<li><a class="lv2" href="#s63"><span class="num">6.3</span>新增/编辑模版</a></li>
+<li><a class="lv2" href="#s66"><span class="num">6.6</span>信息发布</a></li>
+<li><a class="lv2" href="#s67"><span class="num">6.7</span>我收到的</a></li>
+<li><a class="lv2" href="#s68"><span class="num">6.8</span>我的收藏</a></li>
       </ul>
     </nav>
     <div class="side-foot">

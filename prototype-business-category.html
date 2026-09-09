@@ -3275,9 +3275,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="template-editor-back" onclick="closeTemplateModal()">← 返回</div>
     <div style="font-size:15px;font-weight:600;color:var(--text-regular);">新增模版</div>
     <div class="template-editor-actions">
-      <button class="btn btn-default btn-sm" onclick="showToast('暂存','success')">暂存</button>
-      <button class="btn btn-default btn-sm" onclick="openPreview()">预览</button>
-      <button class="btn btn-primary btn-sm" onclick="saveTemplate('publish')">保存并发布</button>
+      <button class="btn btn-default btn-sm" id="tplEditorDraftBtn" onclick="showToast('暂存','success')">暂存</button>
+      <button class="btn btn-default btn-sm" id="tplEditorPreviewBtn" onclick="openPreview()">预览</button>
+      <button class="btn btn-primary btn-sm" id="tplEditorPublishBtn" onclick="saveTemplate('publish')">保存并发布</button>
     </div>
   </div>
   <div class="template-editor-tabs">
@@ -4159,6 +4159,13 @@ function openTemplateModal(mode) {
       if (mode === 'copy') titleEl.textContent = '复制模版';
       else if (mode === 'edit') titleEl.textContent = '编辑模版';
       else titleEl.textContent = '新增模版';
+    }
+    // 启用的模版进入编辑页时，仅保留"预览 / 保存并发布"两个按钮（隐藏"暂存"）
+    var draftBtn = document.getElementById('tplEditorDraftBtn');
+    if (draftBtn) {
+      var data = templateData[currentTemplateId];
+      var isEnabledEdit = mode === 'edit' && data && !data.isDraft && data.enabled !== false;
+      draftBtn.style.display = isEnabledEdit ? 'none' : '';
     }
     if (mode !== 'copy') {
       canvasFields = [];

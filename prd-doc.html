@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生产信息发布平台 PRD · V1.2 · 文档全文</title>
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&display=swap">
+<style>
+/* ===== 设计令牌 ===== */
+:root{
+  --bg:#F3F5F8;
+  --surface:#FFFFFF;
+  --ink:#152433;
+  --ink2:#46586C;
+  --ink3:#8495A7;
+  --line:#E4E9F0;
+  --line2:#CED8E3;
+  --brand:#0D5E8C;
+  --brand-deep:#0A3E5C;
+  --brand-tint:#EAF2F8;
+  --accent:#C0792B;
+  --accent-tint:#FBF1E2;
+  --ok:#1E7D4F;   --ok-tint:#E9F5EE;
+  --warn:#9A6A1D; --warn-tint:#FBF3E3;
+  --danger:#B3402F; --danger-tint:#FBECEA;
+  --gray:#66788B; --gray-tint:#EEF1F5;
+  --radius:10px;
+  --sidebar-w:284px;
+  --font-sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  --font-serif:"Noto Serif SC","Songti SC","SimSun",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.78;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand);text-decoration:none}
+::selection{background:var(--brand);color:#fff}
+
+/* 阅读进度条 */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--brand),var(--accent));z-index:120}
+
+/* ===== 布局 ===== */
+.layout{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;margin-left:var(--sidebar-w)}
+.doc{max-width:1020px;margin:0 auto;padding:0 44px 90px}
+
+/* ===== 侧边栏 ===== */
+.sidebar{
+  position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);background:var(--surface);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:100;
+}
+.side-brand{padding:26px 24px 20px;border-bottom:1px solid var(--line)}
+.side-brand .logo{
+  display:inline-flex;align-items:center;gap:10px;font-weight:900;font-size:16.5px;color:var(--ink);letter-spacing:.5px;
+}
+.side-brand .logo .mark{
+  width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand-deep),var(--brand));
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex:none;
+}
+.side-brand .logo small{display:block;font-size:11px;font-weight:500;color:var(--ink3);letter-spacing:2px}
+.side-brand .ver{
+  margin-top:12px;font-size:12px;color:var(--ink3);
+}
+.side-brand .ver b{color:var(--brand);font-weight:700}
+.toc-wrap{flex:1;overflow-y:auto;padding:14px 12px 20px}
+.toc{list-style:none;font-size:13.5px}
+.toc a{
+  display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:8px;color:var(--ink2);
+  border-left:3px solid transparent;transition:background .15s,color .15s;
+}
+.toc a:hover{background:var(--brand-tint);color:var(--brand-deep)}
+.toc a.active{background:var(--brand-tint);color:var(--brand-deep);border-left-color:var(--brand);font-weight:700}
+.toc .num{font-variant-numeric:tabular-nums;color:var(--ink3);font-size:12px;min-width:26px;font-weight:600}
+.toc a.active .num{color:var(--brand)}
+.toc .lv2{padding-left:20px;font-size:12.8px}
+.side-foot{padding:14px 24px 18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink3);line-height:1.7}
+.side-foot b{color:var(--ink2);font-weight:600}
+
+/* 移动端抽屉 */
+.scrim{position:fixed;inset:0;background:rgba(10,26,40,.45);z-index:99;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.show{opacity:1;pointer-events:auto}
+.topbar{
+  display:none;position:sticky;top:0;z-index:95;background:var(--surface);border-bottom:1px solid var(--line);
+  padding:12px 16px;align-items:center;gap:12px;
+}
+.topbar .logo{font-weight:900;font-size:15px;display:flex;align-items:center;gap:8px}
+.topbar .logo .mark{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--brand-deep),var(--brand));color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+.menu-btn{
+  width:44px;height:44px;border:1px solid var(--line2);background:var(--surface);border-radius:9px;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);
+}
+.menu-btn:hover{background:var(--brand-tint)}
+
+/* ===== 头部 ===== */
+.hero{
+  background:var(--surface);border-bottom:1px solid var(--line);position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(13,94,140,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(13,94,140,.045) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(135deg,rgba(0,0,0,.85),transparent 70%);
+  -webkit-mask-image:linear-gradient(135deg,rgba(0,0,0,.85),transparent 70%);
+}
+.hero-inner{max-width:1020px;margin:0 auto;padding:52px 44px 40px;position:relative}
+.hero .eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:2.5px;color:var(--accent);
+  text-transform:uppercase;
+}
+.hero .eyebrow::before{content:"";width:26px;height:2px;background:var(--accent);border-radius:2px}
+.hero h1{
+  font-family:var(--font-serif);font-size:40px;font-weight:900;color:var(--ink);letter-spacing:1px;margin:14px 0 6px;line-height:1.25;
+}
+.hero h1 .cn{display:block}
+.hero .sub{color:var(--ink2);font-size:15.5px;max-width:680px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.hero .chip{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;font-size:12.5px;font-weight:600;
+  background:var(--gray-tint);color:var(--gray);border:1px solid var(--line);
+}
+.hero .chip b{font-weight:700;color:var(--ink)}
+.hero .chip.ver{background:var(--accent-tint);color:var(--warn);border-color:#EFD9B8}
+.hero .chip.ver b{color:var(--warn)}
+.hero .chips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.hero .mod{
+  padding:5px 13px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--brand-deep);
+  background:var(--brand-tint);border:1px solid #D3E4F0;
+}
+.hero .mod.wide{color:var(--gray);background:#F4F6F9;border-color:var(--line2)}
+
+/* ===== 正文区 ===== */
+.section{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:34px 38px;margin-top:26px;scroll-margin-top:24px;
+}
+.section h2{
+  font-size:21px;font-weight:900;color:var(--ink);display:flex;align-items:baseline;gap:12px;
+  padding-bottom:14px;border-bottom:2px solid var(--ink);letter-spacing:.5px;
+}
+.section h2 .no{color:var(--brand);font-variant-numeric:tabular-nums;flex:none}
+.section h2 .en{font-size:11px;color:var(--ink3);font-weight:500;letter-spacing:2px}
+.section h2.sub{font-size:18px;padding-bottom:11px;border-bottom:1px solid var(--line2);margin-top:0}
+.section h3{
+  font-size:16.5px;font-weight:900;color:var(--brand-deep);margin:30px 0 4px;
+  display:flex;align-items:baseline;gap:10px;
+}
+.section h3 .no{color:var(--brand);font-variant-numeric:tabular-nums;font-size:14px}
+.section h3 .dash{color:var(--line2)}
+.section h4{font-size:15px;font-weight:700;color:var(--ink);margin:22px 0 6px}
+.section p{margin:10px 0;color:var(--ink2)}
+.section p.lead{color:var(--ink);font-weight:500}
+.section ul{margin:10px 0 10px 2px;padding-left:0;list-style:none}
+.section ul li{position:relative;padding-left:20px;margin:6px 0;color:var(--ink2)}
+.section ul li::before{
+  content:"";position:absolute;left:4px;top:11px;width:7px;height:7px;border-radius:2px;
+  background:var(--brand);opacity:.65;
+}
+.section ul li strong{color:var(--ink)}
+.section ol{margin:10px 0;padding-left:24px;color:var(--ink2)}
+.section ol li{margin:5px 0}
+
+/* 表格 */
+.tbl-scroll{overflow-x:auto;margin:14px 0;border:1px solid var(--line2);border-radius:9px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+th{
+  background:var(--brand-tint);color:var(--brand-deep);text-align:left;font-weight:700;
+  padding:9px 13px;border:1px solid var(--line2);white-space:nowrap;
+}
+td{padding:9px 13px;border:1px solid var(--line);vertical-align:top;color:var(--ink2);line-height:1.7}
+tbody tr:nth-child(even) td{background:#FAFBFD}
+tbody tr:hover td{background:var(--brand-tint)}
+td b,td strong{color:var(--ink)}
+td.hl{background:var(--brand-tint)!important}
+table .sub{color:var(--ink3);font-size:12px}
+
+/* 标签 */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;padding:1.5px 9px;border-radius:999px;
+  font-size:11.5px;font-weight:700;white-space:nowrap;line-height:1.7;
+}
+.tag.ok{background:var(--ok-tint);color:var(--ok)}
+.tag.warn{background:var(--warn-tint);color:var(--warn)}
+.tag.danger{background:var(--danger-tint);color:var(--danger)}
+.tag.gray{background:var(--gray-tint);color:var(--gray)}
+.tag.info{background:var(--brand-tint);color:var(--brand-deep)}
+.tag.off{background:#F1F2F4;color:#A8B2BE}
+.req{color:var(--danger);font-weight:700}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:#F1F4F8;border:1px solid var(--line);padding:1px 6px;border-radius:5px;color:var(--brand-deep)}
+
+/* 提示条 */
+.note{
+  margin:14px 0;padding:12px 16px;background:var(--accent-tint);border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;color:#7A5318;font-size:13.5px;line-height:1.75;
+}
+.note.blue{background:var(--brand-tint);border-left-color:var(--brand);color:var(--brand-deep)}
+.note.red{background:var(--danger-tint);border-left-color:var(--danger);color:#8C2F23}
+
+/* 术语卡片 */
+.gloss{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+.gloss .item{background:#FAFBFD;border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+.gloss .item h5{font-size:14px;font-weight:900;color:var(--brand-deep);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.gloss .item h5 .dot{width:7px;height:7px;border-radius:50%;background:var(--brand);flex:none}
+.gloss .item p{font-size:12.8px;color:var(--ink2);line-height:1.75;margin:0}
+
+/* 组件卡片 */
+.comp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+.comp{background:#FAFBFD;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.comp .head{display:flex;align-items:center;gap:11px;padding:12px 15px;background:var(--surface);border-bottom:1px solid var(--line)}
+.comp .icon{
+  width:34px;height:34px;border-radius:8px;background:var(--brand-tint);border:1px solid #D3E4F0;
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:none;
+}
+.comp .icon.mono{font-weight:800;font-size:15px;color:var(--brand-deep);font-family:ui-monospace,Menlo,Consolas,monospace}
+.comp .head h5{font-size:14px;font-weight:900;color:var(--ink)}
+.comp .head .en{font-size:11px;color:var(--ink3)}
+.comp .body{padding:12px 15px;font-size:12.6px;color:var(--ink2);line-height:1.75}
+.comp .body .use{margin-bottom:10px}
+.comp .body .use b{color:var(--brand-deep);font-size:11.5px;letter-spacing:1px}
+.comp .props{border-top:1px dashed var(--line2);padding-top:9px}
+.comp .props b{color:var(--ink);font-size:12px}
+.comp .props .sub-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1px;margin:7px 0 2px}
+.comp .props ul{list-style:none;padding:0;margin:0}
+.comp .props li{position:relative;padding-left:12px;margin:2px 0;font-size:12.4px}
+.comp .props li::before{content:"";position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+
+/* 底部 */
+.doc-foot{margin-top:30px;padding:20px 24px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;color:var(--ink3);font-size:12.5px}
+.doc-foot .note-inline{font-style:italic;color:var(--ink3)}
+
+/* 回到顶部 */
+.totop{
+  position:fixed;right:26px;bottom:30px;width:44px;height:44px;border-radius:12px;border:1px solid var(--line2);
+  background:var(--surface);color:var(--brand-deep);box-shadow:0 6px 18px rgba(15,35,60,.12);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:90;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+}
+.totop.show{opacity:1;pointer-events:auto}
+.totop:hover{transform:translateY(-2px);background:var(--brand-tint)}
+
+/* ===== 响应式 ===== */
+@media (max-width:980px){
+  .sidebar{transform:translateX(-105%);transition:transform .28s ease;box-shadow:none}
+  .sidebar.open{transform:translateX(0);box-shadow:0 0 60px rgba(10,26,40,.25)}
+  .topbar{display:flex}
+  .main{margin-left:0}
+  .hero-inner{padding:38px 22px 30px}
+  .doc{padding:0 16px 70px}
+  .section{padding:26px 20px;margin-top:18px}
+  .gloss,.comp-grid{grid-template-columns:1fr}
+  .hero h1{font-size:30px}
+  .totop{right:16px;bottom:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<!-- ===== 移动端顶栏 ===== -->
+<div class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="打开目录">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div class="logo"><span class="mark">PRD</span>生产信息发布平台</div>
+</div>
+
+<div class="layout">
+  <!-- ===== 侧边栏 / 目录 ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-brand">
+      <div class="logo">
+        <span class="mark">PRD</span>
+        <span>生产信息发布平台<small>PRODUCT REQUIREMENTS</small></span>
+      </div>
+      <div class="ver">版本 <b>V1.2</b> · 创建于 <b>2026-09-04</b></div>
+    </div>
+    <nav class="toc-wrap" aria-label="文档目录">
+      <ul class="toc" id="toc">
+<li><a href="#preface"><span class="num">00</span>前言</a></li>
+<li><a href="#s1"><span class="num">01</span>版本信息</a></li>
+<li><a href="#s2"><span class="num">02</span>变更日志</a></li>
+<li><a href="#s3"><span class="num">03</span>文档说明</a></li>
+<li><a href="#s4"><span class="num">04</span>需求背景</a></li>
+<li><a href="#s5"><span class="num">05</span>需求范围</a></li>
+<li><a href="#s6"><span class="num">06</span>功能详细说明</a></li>
+<li><a class="lv2" href="#s61"><span class="num">6.1</span>6.1</a></li>
+<li><a class="lv2" href="#s62"><span class="num">6.2</span>6.2</a></li>
+<li><a class="lv2" href="#s63"><span class="num">6.3</span>6.3</a></li>
+<li><a class="lv2" href="#s66"><span class="num">6.6</span>6.6</a></li>
+<li><a class="lv2" href="#s67"><span class="num">6.7</span>6.7</a></li>
+<li><a class="lv2" href="#s68"><span class="num">6.8</span>6.8</a></li>
+      </ul>
+    </nav>
+    <div class="side-foot">
+      <b>模块覆盖</b><br>模板管理 · 我发布的 · 我收到的 · 我的收藏 · 发布列表<br>
+      <span style="color:var(--ink3)">文档由 Word 源文件渲染生成，内容保真呈现</span>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ===== 主内容 ===== -->
+  <main class="main">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Product Requirements Document</div>
+        <h1><span class="cn">生产信息发布平台</span></h1>
+        <p class="sub">面向工业生产场景的信息发布平台 PRD 文档全文：覆盖模板管理、我发布的、我收到的、我的收藏、发布列表五大模块，含 13 种表单组件属性、发布规则、定期发布、外部共享与数据导出等完整功能规格。</p>
+        <div class="meta">
+          <span class="chip ver">版本号 <b>V1.2</b></span>
+          <span class="chip">创建日期 <b>2026-09-04</b></span>
+          <span class="chip">审核人 <b>待指定</b></span>
+        </div>
+        <div class="chips2">
+          <span class="mod">模板管理</span>
+          <span class="mod">我发布的</span>
+          <span class="mod">我收到的</span>
+          <span class="mod">我的收藏</span>
+          <span class="mod wide">发布列表 · 数据导出（仅 PC）</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="doc">
+
+<!-- ===== 前言 ===== -->
+<section class="section" id="preface">
+<h2><span class="no">00</span>前言</h2>
+<div class="tbl-scroll"><table><thead><tr><th>本文档为「生产信息发布平台」产品需求文档（PRD），当前版本覆盖模板管理、我发布的、我收到的、我的收藏、发布列表五大模块。模板管理是平台的基础能力，负责业务分类维护、模板组层级管理、表单模板设计与发布规则配置；信息发布是平台的核心业务流程，基于模板完成信息填写、发布、定时/定期任务管理及数据导出；我收到的是信息接收方的工作台，支持收到信息的查看、已读管理、收藏及复制重新发布。</th></tr></thead><tbody></tbody></table></div>
+</section>
+<!-- ===== 版本信息 ===== -->
+<section class="section" id="s1">
+<h2><span class="no">01</span>版本信息</h2>
+<div class="tbl-scroll"><table><thead><tr><th>版本号：V1.2</th></tr></thead><tbody></tbody></table></div>
+<p><b>创建日期：2026-09-04</b></p>
+<p><b>审核人：待指定</b></p>
+</section>
+<!-- ===== 变更日志 ===== -->
+<section class="section" id="s2">
+<h2><span class="no">02</span>变更日志</h2>
+<div class="tbl-scroll"><table><thead><tr><th>时间</th><th>版本号</th><th>变更人</th><th>主要变更内容</th></tr></thead><tbody><tr><td>2026-09-04</td><td>V1.0</td><td>产品经理</td><td><span class="sub">—</span></td></tr></tbody></table></div>
+</section>
+<!-- ===== 文档说明 ===== -->
+<section class="section" id="s3">
+<h2><span class="no">03</span>文档说明</h2>
+<h2 class="sub">名词解释</h2>
+<div class="gloss">
+<div class="item"><h5><span class="dot"></span>业务分类</h5><p>平台顶层组织维度，对应企业内部的业务部门或业务组（如动力能源部、铁区一体化业务组），是模板组和模板的归属根节点</p></div>
+<div class="item"><h5><span class="dot"></span>模板组</h5><p>业务分类下的层级分组，支持多级嵌套，用于对模板进行分类管理（如制水车间、煤气车间）</p></div>
+<div class="item"><h5><span class="dot"></span>模板</h5><p>信息发布的表单结构定义，包含表单字段、发布规则、定期发布配置、外部共享设置等，是发布信息的数据结构蓝本</p></div>
+<div class="item"><h5><span class="dot"></span>表单设计器</h5><p>可视化拖拽式表单构建工具，支持从组件库选择字段拖入画布，配置字段属性，实时预览手机端/电脑端效果</p></div>
+<div class="item"><h5><span class="dot"></span>接收对象</h5><p>模板配置的信息接收方范围，分为「指定成员」（模板固定）和「发起人自选」（发布时由发布人选择）两种模式</p></div>
+<div class="item"><h5><span class="dot"></span>组织人员</h5><p>模板配置中固定的信息接收组织或人员，发布时信息将自动发送给这些对象</p></div>
+<div class="item"><h5><span class="dot"></span>当班人员</h5><p>按班次动态匹配的接收人员，适用于交接班类场景，发布时自动匹配当前当班人员</p></div>
+<div class="item"><h5><span class="dot"></span>定期发布</h5><p>模板级别的定时发布规则，开启后系统按配置的周期（间隔/天/周/月）自动触发信息发布</p></div>
+<div class="item"><h5><span class="dot"></span>外部共享</h5><p>通过链接或二维码将模板数据对外共享，可配置共享字段、数据范围和链接有效期</p></div>
+</div>
+</section>
+<!-- ===== 需求背景 ===== -->
+<section class="section" id="s4">
+<h2><span class="no">04</span>需求背景</h2>
+<h2 class="sub">产品现状</h2>
+<p>当前生产信息发布缺乏统一的模板化管理机制，各业务部门的信息发布格式不统一，字段定义分散，难以进行数据汇总和分析。同时，发布流程依赖人工操作，缺少定期自动发布能力，效率较低。</p>
+<h2 class="sub">用户调研</h2>
+<div class="tbl-scroll"><table><thead><tr><th>关键结论： 各车间（制水、煤气、燃气等）有大量重复性的日志、台账、记录类信息需要定期发布，格式相对固定 用户希望通过可视化方式自定义表单字段，无需开发介入 交接班场景需要按班次自动匹配接收人员 部分数据需要对外共享（如挂牌信息），要求可控的链接访问权限</th></tr></thead><tbody></tbody></table></div>
+<h2 class="sub">竞品分析</h2>
+<div class="tbl-scroll"><table><thead><tr><th>维度</th><th>本产品</th><th>通用低代码平台</th><th>传统OA表单</th></tr></thead><tbody><tr><td>业务分类层级</td><td>业务分类 → 模板组（多级）→ 模板，三级结构贴合工业场景</td><td>一般仅支持文件夹单层管理</td><td>按表单类型分类，无业务维度</td></tr><tr><td>表单设计</td><td>13种工业常用组件，支持手机/PC双端预览</td><td>组件丰富但通用化，需额外配置</td><td>组件有限，定制化弱</td></tr><tr><td>发布规则</td><td>支持指定成员/发起人自选、组织人员+当班人员双轨、修改/撤回时限</td><td>一般仅支持固定接收人</td><td>流程审批导向，非信息发布</td></tr><tr><td>定期发布</td><td>模板级配置，支持间隔/天/周/月四种周期</td><td>需配合工作流实现</td><td>不支持</td></tr></tbody></table></div>
+</section>
+<!-- ===== 需求范围 ===== -->
+<section class="section" id="s5">
+<h2><span class="no">05</span>需求范围</h2>
+<div class="tbl-scroll"><table><thead><tr><th>本期范围：模板管理模块全量功能（业务分类管理、模板组管理、模板列表与详情、模板编辑器）+ 信息发布模块全量功能（发布入口、发布表单、定时/定期发布、我发布的、发布详情、发布后操作、定时任务管理、发布列表与数据导出）+ 我收到的模块全量功能（收到列表、多条件筛选、列表/卡片双视图、批量标记已读、收到详情、已读/未读管理、收藏管理、阅读情况、复制重新发布）。 端侧范围：PC端支持全部模块（模板管理、我发布的、我收到的、我的收藏、发布列表）；移动端仅支持我发布的、我收到的、我的收藏三个模块，模板管理与发布列表仅PC端可用。</th></tr></thead><tbody></tbody></table></div>
+<h2 class="sub">功能架构</h2>
+<div class="tbl-scroll"><table><thead><tr><th>一级模块</th><th>二级功能</th><th>说明</th></tr></thead><tbody><tr><td>业务分类管理</td><td>分类列表</td><td>展示全部分类，按新建时间先后排序</td></tr><tr><td><span class="sub">—</span></td><td>新增/编辑分类</td><td>分类名称（必填，≤30字，唯一）、分类编码（必填，≤30字，唯一）</td></tr><tr><td><span class="sub">—</span></td><td>删除分类</td><td>二次确认，删除后不可恢复；分类下存在模板组时禁止删除</td></tr><tr><td>模板组管理</td><td>模板组树展示</td><td>按业务分类展示多级模板组及下属模板，支持展开/收起</td></tr><tr><td><span class="sub">—</span></td><td>新建模板组</td><td>支持在业务分类或已有模板组下新建子分组</td></tr><tr><td><span class="sub">—</span></td><td>重命名/删除</td><td>右键菜单操作；删除分组前需确认组内无模板</td></tr><tr><td><span class="sub">—</span></td><td>模板搜索</td><td>支持按模板组名称、模板名称模糊搜索</td></tr><tr><td>模板管理</td><td>模板详情</td><td>展示基本信息、高级设置、表单设计</td></tr><tr><td><span class="sub">—</span></td><td>模板操作</td><td>编辑、复制、停用/启用、删除</td></tr><tr><td><span class="sub">—</span></td><td>已停用模板</td><td>默认隐藏，可通过「展示已停用模板」开关切换显示</td></tr><tr><td>模板编辑器</td><td>基础设置</td><td>模板名称、编码、所属模板组、描述</td></tr><tr><td><span class="sub">—</span></td><td>表单设计</td><td>组件库拖拽、画布编辑、属性配置、双端预览</td></tr><tr><td><span class="sub">—</span></td><td>高级设置</td><td>发布规则、定期发布、外部共享</td></tr><tr><td>信息发布</td><td>发布入口与模板选择</td><td>从「我发布的」页面左侧模板树选择模板，点击「发布信息」进入发布表单</td></tr><tr><td><span class="sub">—</span></td><td>发布表单填写</td><td>信息标题（必填）+ 模板字段动态渲染 + 接收对象（沿用模板/自定义）</td></tr><tr><td><span class="sub">—</span></td><td>发布操作</td><td>保存草稿、立即发布、定时发布（单次定时）</td></tr><tr><td><span class="sub">—</span></td><td>复制已发布信息</td><td>从同模板历史已发布记录中选择并复制字段内容，修改后发布</td></tr><tr><td><span class="sub">—</span></td><td>我发布的列表</td><td>按模板树筛选 + 多条件筛选（时间/状态/关键词）+ 列表字段自定义 + 分页</td></tr><tr><td><span class="sub">—</span></td><td>发布详情</td><td>展示发布内容全字段、接收对象、发布时间、阅读量、查看阅读情况、留言区</td></tr><tr><td><span class="sub">—</span></td><td>发布后操作</td><td>修改（受模板配置时限和字段限制）、撤回（受模板配置时限限制）</td></tr><tr><td>发布列表与数据导出</td><td>全量发布数据查询</td><td>管理员视角查询全量发布数据，支持按模板、发布人、时间、状态等多条件筛选</td></tr><tr><td><span class="sub">—</span></td><td>列表字段筛选</td><td>自定义列表展示字段，支持字段勾选与排序</td></tr><tr><td><span class="sub">—</span></td><td>数据导出</td><td>支持横向/纵向导出（Excel/CSV），导出当前筛选结果</td></tr><tr><td><span class="sub">—</span></td><td>批量删除</td><td>勾选多条发布记录进行批量删除，二次确认</td></tr><tr><td>我收到的</td><td>收到列表与模板筛选</td><td>左侧模板树筛选 + 右侧收到信息列表，支持列表/卡片双视图</td></tr><tr><td><span class="sub">—</span></td><td>多条件筛选</td><td>关键字搜索、已读/未读、发布人（通讯录选择器）、系统消息、发布时间范围</td></tr><tr><td><span class="sub">—</span></td><td>列表字段自定义</td><td>根据所选模板动态展示字段列，支持列设置面板勾选显示/隐藏</td></tr><tr><td><span class="sub">—</span></td><td>批量操作</td><td>全选/反选、已选计数、批量标记已读</td></tr><tr><td><span class="sub">—</span></td><td>收到详情</td><td>展示发布信息全字段内容、发布人/时间/范围、阅读量、留言区</td></tr><tr><td><span class="sub">—</span></td><td>已读/未读管理</td><td>打开详情自动标记已读、列表/卡片手动切换已读状态</td></tr><tr><td><span class="sub">—</span></td><td>收藏管理</td><td>列表/卡片/详情页三处收藏入口，收藏状态同步，与「我的收藏」联动</td></tr><tr><td><span class="sub">—</span></td><td>阅读数量</td><td>阅读数量显示</td></tr><tr><td><span class="sub">—</span></td><td>复制重新发布</td><td>将收到的信息内容带入发布表单，修改后重新发布</td></tr><tr><td><span class="sub">—</span></td><td>撤回信息处理</td><td>已撤回信息标记标签，不可查看详情，列表中保留记录</td></tr><tr><td>我的收藏</td><td>收藏列表</td><td>合并展示我发布的和我收到的收藏内容，支持来源/分类/时间筛选，列表/卡片双视图</td></tr><tr><td><span class="sub">—</span></td><td>筛选区</td><td>按来源（我发布的/我收到的）、业务分类、模板筛选</td></tr><tr><td><span class="sub">—</span></td><td>视图切换</td><td>列表/卡片双视图切换，记忆用户上次选择</td></tr><tr><td><span class="sub">—</span></td><td>列表视图</td><td>展示收藏信息列表，包含标题、模板、来源、发布人、发布时间、收藏时间等字段</td></tr><tr><td><span class="sub">—</span></td><td>卡片视图</td><td>卡片式展示收藏信息，支持收藏/取消收藏快捷操作</td></tr><tr><td><span class="sub">—</span></td><td>空状态</td><td>无收藏内容时展示空状态引导，提示用户去收藏信息</td></tr><tr><td><span class="sub">—</span></td><td>查看详情</td><td>根据收藏来源跳转到对应详情页（发布详情/收到详情）</td></tr><tr><td><span class="sub">—</span></td><td>取消收藏</td><td>支持在收藏列表中直接取消收藏，取消后同步移除</td></tr><tr><td><span class="sub">—</span></td><td>数据同步</td><td>与我发布的、我收到的收藏状态实时同步，三处收藏入口状态一致</td></tr><tr><td><span class="sub">—</span></td><td>撤回信息处理</td><td>已撤回信息标记标签，不可查看详情，列表中保留记录</td></tr></tbody></table></div>
+<h3>端侧模块范围</h3>
+<p>本系统支持PC端（Web）和移动端（H5/小程序）双端访问，不同端侧开放的功能模块如下：</p>
+<div class="tbl-scroll"><table><thead><tr><th>功能模块</th><th>PC端</th><th>移动端</th><th>说明</th></tr></thead><tbody><tr><td>模板管理（含业务分类）</td><td>✅ 支持</td><td>❌ 不支持</td><td>模板创建、编辑、分类管理等配置型操作仅PC端提供；移动端仅可在发布时选择已有模板</td></tr><tr><td>我发布的</td><td>✅ 支持</td><td>✅ 支持</td><td>双端功能一致；移动端通过底部Tab进入，支持发布、查看、编辑、撤回等操作</td></tr><tr><td>我收到的</td><td>✅ 支持</td><td>✅ 支持</td><td>双端功能一致；移动端默认首页，支持已读/未读、筛选、收藏、评论等</td></tr><tr><td>我的收藏</td><td>✅ 支持</td><td>✅ 支持</td><td>双端数据实时同步；移动端通过底部Tab进入，支持来源/分类筛选</td></tr><tr><td>发布列表与数据导出</td><td>✅ 支持</td><td>❌ 不支持</td><td>全量数据查询、导出、批量删除等管理员操作仅PC端提供</td></tr></tbody></table></div>
+<p>移动端导航：移动端采用底部Tab栏导航，共三个Tab——「<b>我收到的</b>」（默认首页）、「<b>我发布的</b>」、「<b>我收藏的</b>」，无侧边栏和模板管理入口。发布操作通过右下角悬浮按钮（FAB）触发模板选择。</p>
+<p>PC端导航：PC端采用左侧侧边栏导航，包含模板管理、我发布的、我收到的、我的收藏、发布列表五个菜单项；管理员可见发布列表，普通用户该菜单隐藏。</p>
+</section>
+<!-- ===== 功能详细说明 ===== -->
+<section class="section" id="s6">
+<h2><span class="no">06</span>功能详细说明</h2>
+<h2 class="sub" id="s61">6.1 业务分类管理</h2>
+<h3><span class="no">6.1.1</span>功能概述</h3>
+<p>业务分类是平台的顶层组织维度，对应企业内部的业务部门或业务组。管理员可在此维护全部分类，分类下可挂载模板组和模板。端侧支持：仅PC端。</p>
+<h3><span class="no">6.1.2</span>业务分类列表</h3>
+<p><b>页面入口：① 左侧导航栏 → 模版管理；② 模板管理页面左侧顶部业务分类下拉选择器 → 底部「<b>新增业务分类</b>」</b></p>
+<p><b>排序规则：以新建时间先后排序</b></p>
+<h3><span class="no">6.1.3</span>新增/编辑业务分类</h3>
+<p><b>交互方式：弹窗表单</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>字段</th><th>必填</th><th>长度限制</th><th>规则说明</th></tr></thead><tbody><tr><td>分类名称</td><td>是</td><td>≤30字</td><td>名称不可重复；支持中英文、数字、特殊字符</td></tr><tr><td>分类编码</td><td>是</td><td>≤30字</td><td>全局唯一；支持自动生成和手动输入，手动输入仅允许 大写字母、数字、下划线（_）、中划线（-）；自动生成规则C + YYMMDD + 4位流水；创建后不可修改</td></tr></tbody></table></div>
+<h3><span class="no">6.1.4</span>删除业务分类</h3>
+<p>点击「<b>删除</b>」弹出二次确认弹窗，提示「<b>删除后不可恢复</b>」</p>
+<p>若该分类下存在模板组或模板，禁止删除，提示「<b>该分类下存在模板组，请先清理后再删除</b>」</p>
+<p>删除成功后，模板管理页面左侧业务分类下拉列表同步更新</p>
+<p>若在模板管理页面删除当前选中的业务分类，删除成功后自动切换到下拉列表中的第一个分类，并同步加载该分类下的模板组与模板</p>
+<h2 class="sub" id="s62">6.2 模板管理主页</h2>
+<h3><span class="no">6.2.1</span>页面布局</h3>
+<p><b>模板管理页面采用左右分栏布局：端侧支持：仅PC端。</b></p>
+<p><b>左侧栏：业务分类选择器 + 模板搜索框 + 模板组/模板树 + 新建按钮</b></p>
+<p><b>右侧主区域：模板详情展示（基本信息 + 权限配置 + 表单预览）</b></p>
+<h3><span class="no">6.2.2</span>业务分类选择器</h3>
+<p>顶部下拉展示当前选中的业务分类，点击展开全部分类列表</p>
+<p>每个分类项右侧常驻显示「<b>⋯</b>」操作按钮，点击弹出「<b>编辑</b>」「<b>删除</b>」操作菜单</p>
+<p>下拉列表底部固定「<b>＋ 新增业务分类</b>」入口</p>
+<p>切换业务分类后，下方模板树刷新为该分类下的模板组和模板</p>
+<h3><span class="no">6.2.3</span>模板搜索</h3>
+<p>搜索框支持按模板组名称、模板名称模糊匹配</p>
+<p>搜索结果在模板树中高亮匹配项，自动展开匹配项所在的分组</p>
+<p>清空搜索框后恢复完整树展示</p>
+<h3><span class="no">6.2.4</span>模板组/模板树</h3>
+<p class="lead"><b>工具栏：</b></p>
+<p>「<b>📁 新建模版组</b>」：在当前业务分类根节点下新建模板组</p>
+<p>「<b>📄 新建模版</b>」：打开模板编辑器，默认归属当前选中的模板组</p>
+<p>新建模版组</p>
+<div class="tbl-scroll"><table><thead><tr><th>字段</th><th>必填</th><th>长度限制</th><th>规则说明</th></tr></thead><tbody><tr><td>模版组名称</td><td>是</td><td>≤50字</td><td>同一业务分类下名称不可重复</td></tr><tr><td>模版组编码</td><td>是</td><td>≤50字</td><td>全局唯一；支持自动生成和手动输入，手动输入仅允许 大写字母、数字、下划线（_）、中划线（-）；自动生成规则 G + YYMMDD + 4位流水；创建后不可修改</td></tr></tbody></table></div>
+<p class="lead"><b>模板组节点：</b></p>
+<p>支持多级嵌套展开/收起，最多支持5级嵌套，点击箭头或模版组名称切换</p>
+<p>悬停显示「<b>⋯</b>」操作菜单，包含：新增子分组、重命名、删除</p>
+<p>删除模板组时，若组内存在模板（含已停用），禁止删除</p>
+<p class="lead"><b>模板节点：</b></p>
+<p>点击模板节点，右侧展示该模板详情</p>
+<p>当前选中模板高亮显示</p>
+<p>悬停显示「<b>⋯</b>」操作菜单，启用模版、草稿模版、已停用模版操作包含：编辑、复制、停用/启用、删除，草稿模版操作菜单：编辑、复制、发布、删除</p>
+<p>模版停用后在【我发布的】发布消息时不能被引用，仅支持查看停用模版下的历史发布列表，支持查看、收藏、删除历史引用该模版发布的消息</p>
+<p><b>模版标签：暂存模版后有「<b>草稿</b>」状态，设置了定期任务有「<b>定期</b>」标签</b></p>
+<p>已停用模板默认隐藏，每个模板组下有「<b>展示已停用模版</b>」复选框，勾选后显示该组下已停用模板（灰色文字）</p>
+<h3><span class="no">6.2.5</span>模板详情</h3>
+<p class="lead"><b>操作区：</b></p>
+<p><b>操作按钮：编辑、复制、停用/启用、发布（根据当前状态切换文案）</b></p>
+<p class="lead"><b>基本信息区：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>模版名称</th><th>交接班日志+状态（启用/停用/草稿）</th><th></th><th></th></tr></thead><tbody><tr><td>模版编码</td><td>TPL-JBJRZ-001</td><td>模版路径</td><td>动力能源部/制水车间</td></tr><tr><td>创建时间</td><td>2024-05-26 12:36</td><td>最近更新时间</td><td>2026-08-21 10:18</td></tr></tbody></table></div>
+<p class="lead"><b>发布规则配置区：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>接收对象</th><th>显示「指定人员」或「发起人自选」；指定人员模式下标注「发起人发布的信息将送给指定成员，不能修改」；发起人自选模式下标注「发布信息时，由发起人自主指定该信息的接收成员」</th></tr></thead><tbody><tr><td>组织人员</td><td>以标签形式展示，点击「修改」打开通讯录选择器</td></tr><tr><td>当班人员</td><td>以标签形式展示，未配置时显示「--」，点击「修改」打开通讯录选择器</td></tr></tbody></table></div>
+<p class="lead"><b>表单预览区：</b></p>
+<p>支持「<b>电脑端</b>」「<b>手机端</b>」Tab切换预览</p>
+<p><b>电脑端：以表单形式展示字段布局，明细类字段以表格形式展示</b></p>
+<p><b>手机端：以手机外框模拟移动端展示效果</b></p>
+<p>组件动态渲染，预览为只读展示，不可编辑</p>
+<h2 class="sub" id="s63">6.3 新增/编辑模版</h2>
+<h3><span class="no">6.3.1</span>编辑器整体结构</h3>
+<p><b>顶部操作栏：返回按钮、标题（新增模版/编辑模版）、暂存、预览、保存并发布</b></p>
+<p><b>Tab导航：基础设置 / 表单设计 / 高级设置</b></p>
+<p><b>内容区：根据Tab切换对应编辑界面</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>保存规则： 「暂存」：保存当前编辑内容为草稿状态，不发布，模板状态为「草稿」 「保存并发布」：校验必填项后保存并发布，①未设置定期发布，模板状态为「正常」；②设置了定期发布，模版显示「定期」标签 编辑已有模板时，修改后「保存并发布」直接覆盖原模板；不能暂存 未保存离开新增页面时弹出确认提示“当前填写的信息尚未暂存，离开后将全部清空。” 设置了定期发布，但接收对象选择的【发起人自选】，点击【暂存】和【保存并发布】需要提示“定期任务需要设置接收对象” 接收对象选择了【指定接收人】但未设置当班人员、组织人员，点击【暂存】和【保存并发布】时需要提示“请选择接受对象” 【预览】查看设置的表单设计和模版标题</th></tr></thead><tbody></tbody></table></div>
+<h3><span class="no">6.3.2</span>基础设置</h3>
+<div class="tbl-scroll"><table><thead><tr><th>字段</th><th>必填</th><th>长度限制</th><th>规则说明</th></tr></thead><tbody><tr><td>模版名称</td><td>是</td><td>≤50字</td><td>同一模板组下名称不可重复</td></tr><tr><td>模版编码</td><td>是</td><td>≤50字</td><td>全局唯一；支持自动生成和手动输入，手动输入仅允许 大写字母、数字、下划线（_）、中划线（-）；自动生成规则 T + YYMMDD + 4位流水；创建后不可修改</td></tr><tr><td>选择模版组</td><td>是</td><td>—</td><td>默认选中当前业务分类下选中的模版组层级路径，下拉选择，展示当前业务分类下的所有模板组层级路径（如 动力能源部 / 制水车间）</td></tr><tr><td>模版描述</td><td>否</td><td>≤500字</td><td>多行文本，用于说明模板用途和注意事项</td></tr></tbody></table></div>
+<h3><span class="no">6.3.3</span>表单设计</h3>
+<p><b>表单设计器采用三栏布局：左侧组件库、中间画布、右侧属性面板。</b></p>
+<p class="lead"><b>组件库及其属性：</b></p>
+<div class="note">手机端不支持设置标题样式、标题对齐方式，PC端统一标题样式和标题对齐方式，修改其中一个组件另外的组件同步修改</div>
+<div class="comp-grid">
+<div class="comp">
+<div class="head"><span class="icon mono">T</span><h5>单行输入框</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>短文本输入，如标题、编号、名称等</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>提示文字：最多50字符</li><li>单位：最多20字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>数据来源：手动添加（默认值、最多20字符）、从数据源获取（接入混合集成，选择接口名称、参数名称）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">≡</span><h5>多行输入框</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>长文本输入，如描述、备注、情况说明等，支持字数统计</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>提示文字：最多50字符</li><li>单位：最多20字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>数据来源：</li><li>手动添加（默认值、最多20字符）</li><li>从数据源获取（接入混合集成，选择接口名称、参数名称）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">#</span><h5>数字输入框</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>数值输入，支持配置小数位数、单位、取值范围</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>保留小数位：默认2</li><li>提示文字：最多50字符</li><li>单位：最多20字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>数据来源：</li><li>手动添加（默认值，最多20字符）</li><li>从数据源获取（接入混合集成，选择接口名称、参数名称）</li><li>函数公式（设置函数公式必填：函数公式、取数对象（当拖入多个数字输入框可以选择某个输入框应用公式计算）、运算符号、数字键盘）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">◉</span><h5>单选</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>单选下拉或单选按钮组，支持自定义选项、配置数据源接口</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>提示文字：最多50字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>数据来源：</li><li>手动添加（必填，名称、key值）</li><li>从数据源获取（接入混合集成，选择接口名称、参数名称）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">📅</span><h5>日期</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>日期选择器，支持日期/日期时间格式，支持默认当前时间</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>日期类型：年、年/月、年/月/日、年/月/日 时 分 秒</li><li>默认日期：系统日期（默认不勾选）</li><li>提示文字：最多50字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>从数据源获取（接入混合集成，选择接口名称、参数名称）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">☰</span><h5>明细</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>可动态增删行的子表格，用于记录多条明细数据（如运行记录、设备清单） 明细组件支持嵌套单行输入框、多行输入框、数字输入框、单选、日期、图片上传、文件上传、选择器、人员选择、组织选择组件 标题样式提示 明细预览：支持新增、删除一条</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：必填，最多30字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>操作文案：最多10字符</li><li>是否必填：默认不勾选</li></ul>
+</div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">🖼</span><h5>图片上传</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>支持多图上传，可配置最大数量、单图大小限制 支持.jpg,.jpeg,.bmp,.gif,.png类型文件，10MB以内</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>是否必填：默认不勾选</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">📎</span><h5>文件上传</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>支持附件上传，可配置文件类型、大小限制 持.doc、.docx、.pdf、.xls、.xlsx、.ppt、.pptx、.zip、.rar类型文件，单个文件上传不能超过500MB</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>提示文字：最多50字符</li><li>是否必填：默认不勾选</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">🔗</span><h5>链接</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>URL链接输入，发布后可点击跳转 不同类型预览样式不同，预览加载出链接打开后内容 视频： 音频： 其他：</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>类型：视频、音频、图片、文件、其他</li><li>链接：必填</li><li>高度：默认150，仅类型为“其他”有该设置项</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">▦</span><h5>面板</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>分组容器，用于将相关字段视觉分组，可设置面板标题 面板组件支持嵌套单行输入框、多行输入框、数字输入框、单选、日期、明细、图片上传、文件上传、面板、备注、选择器、人员选择、组织选择组件，最多支持嵌套3层面板组件</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30字符，勾选框隐藏标题（默认不勾选）</li></ul>
+</div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">📌</span><h5>备注</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>只读说明文字，用于填写提示或补充说明</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>说明文字：最多500字</li></ul>
+</div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon mono">⚙</span><h5>选择器</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>关联混合继承数据源接口的选择器，支持从API获取选项列表</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>提示文字：最多50字符</li><li>单位：最多20字符</li><li>是否必填：默认不勾选</li></ul>
+<div class="sub-t">数据设置</div>
+<ul><li>数据来源：</li><li>默认值（最多20字符）</li><li>从数据源获取（接入混合集成，选择接口名称、参数名称）</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">👤</span><h5>人员选择</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>从通讯录选择人员，支持单选/多选</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>选择类型：必填，人员单选（默认选中）、人员多选</li><li>人员选择范围：必填，全部人员（默认选中）、指定人员、提交人所在的部门及子部门</li><li>提示文字：最多50字符</li><li>是否必填：默认不勾选</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+<div class="comp">
+<div class="head"><span class="icon">🏢</span><h5>组织选择</h5></div>
+<div class="body">
+<div class="use"><b>用途</b><p>从通讯录选择组织部门，支持单选/多选</p></div>
+<div class="props">
+<div class="sub-t">基础</div>
+<ul><li>标题：最多30个字符，勾选框隐藏标题（默认不勾选）</li><li>标题样式：左右布局（默认选中）、上下布局</li><li>标题对齐方式：左对齐、右对齐（默认选中）</li><li>选择类型：组织单选（默认选中）、组织多选</li><li>人员选择范围：全部组织（默认选中）、指定组织、提交人所在的组织</li><li>提示文字：最多50字符</li><li>是否必填：默认不勾选</li></ul>
+</div>
+<div style="margin-top:8px"><span class="tag info">标题样式提示</span></div>
+</div>
+</div>
+</div>
+<p class="lead"><b>画布区：</b></p>
+<p>顶部「<b>手机端/电脑端</b>」切换按钮，切换画布展示形态</p>
+<p><b>手机端：手机外框容器，组件纵向排列，模拟真实移动端效果</b></p>
+<p><b>电脑端：宽屏容器，组件按PC端布局展示，PC端组件一排最多支持3个组件</b></p>
+<p>从左侧组件库拖拽组件到画布中添加</p>
+<p>画布中组件支持上下拖拽排序、点击选中、复制、删除操作</p>
+<p>空画布显示提示「<b>请从左侧拖入组件到手机容器中</b>」</p>
+<p class="lead"><b>属性面板：</b></p>
+<p>选中画布中组件后，右侧展示该组件的属性配置，通用属性包括：</p>
+<p><b>字段名称：表单中显示的标签文字</b></p>
+<p><b>占位提示：输入框placeholder文字</b></p>
+<p><b>是否必填：开关控制，必填字段发布时校验</b></p>
+<p><b>默认值：可配置固定默认值或公式计算</b></p>
+<p><b>显示条件：配置字段的显示/隐藏逻辑（基于其他字段值）</b></p>
+<p class="lead"><b>各组件特有属性：</b></p>
+<p><b>单行/多行输入框：最大字数、正则校验规则</b></p>
+<p><b>数字输入框：小数位数、单位、最小值/最大值、计算公式</b></p>
+<p><b>单选：选项列表管理（增删改）、数据源接口绑定、选项值与显示文本映射</b></p>
+<p><b>明细：子表字段配置（列名、列类型）、最大行数、最小行数</b></p>
+<p><b>图片/文件上传：最大数量、单文件大小限制、允许的文件类型</b></p>
+<p><b>选择器：数据源接口选择、返回字段映射</b></p>
+<h3><span class="no">6.3.4</span>高级设置 — 发布规则</h3>
+<p class="lead"><b>接收对象配置：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>配置项</th><th>说明</th></tr></thead><tbody><tr><td>接收对象模式</td><td>单选：指定成员（模板固定接收人，发布时不可修改）/ 发起人自选（发布时由发布人选择接收人）</td></tr><tr><td>组织人员</td><td>仅「指定成员」模式下可配置；通过通讯录选择器添加人员/组织/角色组，以标签形式展示，可逐个移除</td></tr><tr><td>当班人员</td><td>仅「指定成员」模式下可配置；通过通讯录选择器添加，发布时自动匹配当前班次对应人员；适用于交接班日志等场景</td></tr></tbody></table></div>
+<p class="lead"><b>发布后操作权限：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>权限项</th><th>默认值</th><th>配置说明</th></tr></thead><tbody><tr><td>内容发布后允许发布者修改</td><td>关闭</td><td>开启后可配置：允许修改时限（分钟/小时/天），默认30分钟+ 允许修改的字段（从表单字段中多选）</td></tr><tr><td>发布内容后允许发布者撤回</td><td>开启</td><td>开启后可配置：允许撤回时限（分钟/小时/天），默认30分钟</td></tr></tbody></table></div>
+<h3><span class="no">6.3.5</span>高级设置 — 定期发布</h3>
+<p>总开关：默认关闭，开启后显示规则配置区，提示“设置发布周期后，需要指定接收对象，系统将按此规律自动执行，无需重复手动操作”</p>
+<p>当</p>
+<p><b>规则类型（四选一）：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>规则类型</th><th>配置项</th></tr></thead><tbody><tr><td>每隔一段时间</td><td>间隔数值 + 单位（秒/分钟/小时）；如「每隔2小时」,最短时间间隔1小时</td></tr><tr><td>按天</td><td>每天固定时间点（可添加多个时间点，如 08:00、20:00）</td></tr><tr><td>按周</td><td>选择星期几（可多选）+ 固定时间点（可多个）</td></tr><tr><td>按月</td><td>选择每月几号（可多选）+ 固定时间点（可多个）</td></tr></tbody></table></div>
+<p>定期发布开启后，系统将按规则自动创建发布任务，使用模板的表单结构和默认值生成信息并发送给配置的接收对象。发布人可在「<b>我发布的</b>」中查看定期发布的历史记录。</p>
+<p>定期发布默认关闭状态，只有在接收对象设置了【指定成员】才有定期发布设置</p>
+<h3><span class="no">6.3.6</span>高级设置 — 外部共享</h3>
+<p>通过链接或二维码将引用模板的发布数据对外共享，无需登录平台即可查看。支持查看人按标题关键字搜索、支持筛选发布时间、发布状态筛选数据</p>
+<div class="tbl-scroll"><table><thead><tr><th>配置项</th><th>说明</th></tr></thead><tbody><tr><td>共享链接</td><td>用户点击【确认】系统自动生成唯一链接，支持一键复制；支持下载二维码图片</td></tr><tr><td>共享字段</td><td>从表单字段中多选，仅选中的字段在共享页面展示；默认选中展示全部字段</td></tr><tr><td>数据范围</td><td>单选：全部 / 近一年 / 近半年 / 近一个月（默认近一个月）</td></tr><tr><td>链接有效期</td><td>单选：永久 / 24小时 / 七天 / 一个月 / 自定义（选择到期日）；过期后链接自动失效</td></tr></tbody></table></div>
+<p>支持新增多个共享配置，每个共享配置生成独立链接和二维码，可分别设置字段、范围、链接有效期。</p>
+<div class="tbl-scroll"><table><thead><tr><th>当用户修改共享字段、数据范围、链接有效期，需要再次点击【确认】生成新的链接，原链接和二维码失效 删除共享后，链接和二维码失效 修改表单设计后，没有重新设置外部共享，不影响原链接和二维码，用户打开链接后查看的消息列表字段还是原设置的共享字段，如：表单设计原有A、B、C字段，共享字段设置了全部A、B、C，再次修改了表单设计B、C、D，在没有重新设置共享字段的情况下看到的还是A、B、C</th></tr></thead><tbody></tbody></table></div>
+<h2 class="sub" id="s66">6.6 信息发布</h2>
+<h3><span class="no">6.6.1</span>功能概述</h3>
+<p>信息发布是平台的核心业务流程，用户基于已发布的模板填写表单内容，选择接收对象（或沿用模板配置），通过立即发布、定时发布方式将信息推送给目标人员。发布后可在「<b>我发布的</b>」中查看记录、进行修改或撤回操作，管理员可在「<b>发布列表</b>」中查看全量数据并导出。端侧支持：PC端 + 移动端（发布列表仅PC端）。</p>
+<h3><span class="no">6.6.2</span>发布入口与模板选择</h3>
+<p><b>页面入口：侧边栏「<b>生产信息小报</b>」→「<b>我发布的</b>」</b></p>
+<p><b>页面布局：左右分栏</b></p>
+<p><b>左侧栏：业务分类选择器 + 模板搜索框 + 模板组/模板树</b></p>
+<p><b>右侧主区域：发布信息列表（筛选区 + 列表 + 分页）</b></p>
+<p class="lead"><b>模板选择与发布入口：</b></p>
+<p>左侧模板树中点击某个模板节点，右侧列表自动筛选为该模板的发布记录</p>
+<p>选中模板后，右侧列表顶部出现「<b>+ 发布信息</b>」按钮，点击进入发布表单页面</p>
+<p>未选中模板时，「<b>+ 发布信息</b>」按钮不显示，提示「<b>请先在左侧选择模板</b>」</p>
+<p>已停用模板不在发布入口的模板树中展示（仅模板管理中可见）</p>
+<h3><span class="no">6.6.3</span>发布表单填写</h3>
+<p><b>顶部操作栏：返回按钮 + 页面标题（发布信息 / 编辑发布信息）+ 模板名称标签</b></p>
+<p class="lead"><b>表单字段：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>字段</th><th>必填</th><th>规则说明</th></tr></thead><tbody><tr><td>信息标题</td><td>必填</td><td>单行输入框，≤100字；默认自动填充为「模板名称 + 当前日期」，可手动修改</td></tr><tr><td>模板字段区</td><td>视模板配置</td><td>根据所选模板的表单设计动态渲染字段，包括单行/多行输入、数字、单选、日期、明细、图片/文件上传、链接、选择器、人员/组织选择等；模板中标记为必填的字段发布时校验</td></tr><tr><td>明细字段</td><td>视模板配置</td><td>动态增删行的子表格，支持添加行、删除行、行内编辑；受模板配置的最大/最小行数限制</td></tr><tr><td>接收对象</td><td>必填</td><td>沿用模板配置，发布时不可修改：指定成员模式下展示固定接收人列表；发起人自选模式下展示通讯录选择器，由发布人选择接收对象组织人员、当班人员</td></tr></tbody></table></div>
+<p class="lead"><b>底部操作栏：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>操作按钮</th><th>说明</th></tr></thead><tbody><tr><td>保存草稿</td><td>保存当前填写内容为草稿状态，不发送给接收对象；草稿可在「我发布的」列表中继续编辑</td></tr><tr><td>发布</td><td>校验必填项后立即发布，信息发送给接收对象；发布后状态为「已发布」</td></tr><tr><td>定时发布</td><td>点击展开定时配置面板，选择发布时间后保存，状态为「定时待发布」，到点自动发布</td></tr><tr><td>预览</td><td>支持切换手机端、电脑端查看</td></tr></tbody></table></div>
+<p><b>编辑模式差异：编辑已发布信息时，底部按钮变为「<b>更新发布</b>」「<b>预览</b>」；仅模板配置中允许修改的字段可编辑，其余字段只读展示。</b></p>
+<p>复制已发布信息</p>
+<p>在发布信息页面，点击「<b>复制已发布信息</b>」按钮，弹出同模板历史已发布记录列表</p>
+<p><b>列表展示：信息标题、发布时间，支持按标题搜索</b></p>
+<p>选择一条记录后，该记录的全部字段值回填到当前表单中，信息标题自动追加「<b>- 副本</b>」后缀</p>
+<p>用户可在复制内容基础上修改后发布，适用于重复性日志/台账类场景</p>
+<p>复制操作不影响原记录</p>
+<p>复制已发布消息，回填内容以最新模版内容为准，如历史模版表单有A、B、C、D，最新模版表单只有A、B、C，复制后只回填A、B、C内容</p>
+<p>获取数据</p>
+<p>模版中设置了从数据源中获取数据，在发布消息时可以点击【获取数据】刷新最新数据填写</p>
+<h3><span class="no">6.6.4</span>定时发布与定期发布</h3>
+<p><b>定时发布（单次）：</b></p>
+<p>点击「<b>定时发布</b>」展开配置面板</p>
+<p>选择发布日期（日期选择器，不可选过去日期）+ 发布时间（时间选择器，精确到分钟）</p>
+<p>确认后保存，状态为「<b>定时待发布</b>」，到点系统自动执行发布</p>
+<p>在到达发布时间前，可在「<b>我发布的</b>」中修改内容、取消定时（取消后回到草稿）、修改发布时间</p>
+<p><b>定期发布（周期）：</b></p>
+<p>仅当模板的高级设置中开启了「<b>定期发布</b>」时，发布表单中显示「<b>定期发布</b>」入口</p>
+<p>定期发布规则沿用模板配置（间隔/天/周/月），发布时不可修改</p>
+<p>首次发布后，系统按规则自动创建后续发布任务，每次执行使用当前表单内容的快照</p>
+<h3><span class="no">6.6.5</span>我发布的列表</h3>
+<p class="lead"><b>筛选条件：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>筛选项</th><th>说明</th></tr></thead><tbody><tr><td>发布类型</td><td>单次发布、周期发布，默认选中单次发布，</td></tr><tr><td>发布时间</td><td>日期范围选择器，默认近30天</td></tr><tr><td>发布状态</td><td>下拉单选，默认全部<br>单次发布：全部、草稿、定时待发布、已发布、已撤回、发布失败<br>周期发布：全部、草稿、已发布、已撤回、发布失败</td></tr><tr><td>关键词搜索</td><td>按信息标题模糊匹配</td></tr></tbody></table></div>
+<p class="lead"><b>列表字段：</b></p>
+<p>单次发布</p>
+<p><b>默认字段：序号、信息标题、发布状态、发布时间、创建时间、操作</b></p>
+<p>支持「<b>列表字段设置</b>」自定义显示字段，可从模板字段中选择额外列展示</p>
+<p>周期发布</p>
+<p><b>默认字段：序号、信息标题、发布状态、发布时间、来源周期、操作</b></p>
+<p>支持「<b>列表字段设置</b>」自定义显示字段，可从模板字段中选择额外列展示</p>
+<div class="tbl-scroll"><table><thead><tr><th>默认显示所有字段，默认字段+模版表单字段</th></tr></thead><tbody></tbody></table></div>
+<p class="lead"><b>操作：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>状态</th><th>操作</th><th>说明</th></tr></thead><tbody><tr><td>草稿</td><td>详情、复制、编辑、发布、删除、收藏</td><td><span class="sub">—</span></td></tr><tr><td>定时待发布</td><td>详情、复制、编辑、修改时间、取消发布、收藏</td><td><span class="sub">—</span></td></tr><tr><td>已发布</td><td>详情、复制、收藏、编辑、撤回</td><td>编辑、撤回，需要在模版管理中设置了允许编辑、允许撤回才有该按钮，超过编辑、撤回时效，按钮置灰，并提示“已超过编辑/撤回时间”</td></tr><tr><td>已撤回</td><td>详情、复制、删除、收藏</td><td><span class="sub">—</span></td></tr><tr><td>发送失败</td><td>详情、复制、编辑、删除、收藏</td><td><span class="sub">—</span></td></tr></tbody></table></div>
+<p>支持复制消息，复制后字段值回填到新表单中，信息标题自动追加「<b>- 副本</b>」后缀，复制操作不影响原纪录</p>
+<p>支持收藏消息</p>
+<p><b>分页：10/20/50条/页切换</b></p>
+<h3><span class="no">6.6.6</span>发布详情</h3>
+<p class="lead"><b>基本信息区：</b></p>
+<p>信息标题 、发布人、发布时间、发布范围、阅读量、最近编辑时间（重新编辑后才有该字段）、撤回时间（有撤回操作才有该字段）、失败原因（发送失败才有该字段）、接收对象</p>
+<div class="tbl-scroll"><table><thead><tr><th>阅读量大于接收人数量，可通过链接分享给其他用户，不需要登录平台可查看消息详情页，一个用户算一次阅读量</th></tr></thead><tbody></tbody></table></div>
+<p class="lead"><b>内容区：</b></p>
+<p>按模板表单结构展示全部字段值</p>
+<p>图片/文件字段支持点击预览/下载</p>
+<p class="lead"><b>评论区：</b></p>
+<p>接收对象和发布人可在详情页发表评论</p>
+<p><b>评论展示：评论人头像、名称、评论时间、评论内容</b></p>
+<p>支持回复评论、删除自己的评论</p>
+<h3><span class="no">6.6.7</span>发布后操作</h3>
+<p class="lead"><b>编辑已发布信息：</b></p>
+<p>仅当模板配置中「<b>内容发布后允许发布者修改</b>」为开启时，详情页显示「<b>编辑</b>」按钮</p>
+<p><b>编辑受时限限制：超过模板配置的允许修改时限后，「<b>编辑</b>」按钮置灰不可点击</b></p>
+<p>编辑时仅模板配置中「<b>允许编辑的字段</b>」可编辑，其余字段只读</p>
+<p>编辑保存后，接收对象收到更新通知，详情页展示编辑记录（编辑时间）</p>
+<p class="lead"><b>撤回已发布信息：</b></p>
+<p>仅当模板配置中「<b>发布内容后允许发布者撤回</b>」为开启时，详情页显示「<b>撤回</b>」按钮</p>
+<p><b>撤回受时限限制：超过模板配置的允许撤回时限后，「<b>撤回</b>」按钮置灰不可点击</b></p>
+<p>点击「<b>撤回</b>」弹出二次确认，提示「<b>撤回后接收对象将无法查看该信息</b>」</p>
+<p>撤回成功后，信息状态变为「<b>已撤回</b>」，接收对象端该信息标记为已撤回且不可查看详情</p>
+<p>撤回操作不可撤销</p>
+<p class="lead"><b>查看阅读情况：</b></p>
+<p>查看接收人中的阅读情况，已读人员和未读人员列表展示</p>
+<p class="lead"><b>链接分享：</b></p>
+<p><b>设置链接有效期：永久/24小时/7天/一个月/自定义，通过分享链接，用户在有效期内可不需登录查看消息详情，仅支持查看</b></p>
+<h3><span class="no">6.6.8</span>发布列表与数据导出</h3>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.1</span> 功能概述</h4>
+<p>发布列表是管理员视角的全量发布数据管理模块，集中展示系统中所有发布记录（不限发布人），支持多维度筛选、字段自定义、数据导出和批量删除。与「<b>我发布的</b>」仅展示当前用户记录不同，本模块面向管理员和运营人员，用于全局数据查看、审计和导出。</p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.2</span> 页面权限及操作</h4>
+<p><b>权限控制：管理员角色可操作全量数据；普通用户显示自己发布的数据</b></p>
+<p><b>删除：支持单条/批量删除，二次确认后执行，只删除记录</b></p>
+<p><b>导出：支持单条/批量导出，导出时可设置导出字段，支持横向/纵向导出，支持导出Excel/csv格式</b></p>
+<p><b>端侧支持：仅PC端，移动端无该模块入口</b></p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.3</span> 筛选区</h4>
+<p>右侧顶部筛选栏包含以下筛选项，各条件之间为 AND 关系：</p>
+<div class="tbl-scroll"><table><thead><tr><th>筛选项</th><th>控件类型</th><th>说明</th></tr></thead><tbody><tr><td>发布时间</td><td>日期范围选择器</td><td>开始日期 ~ 结束日期，按发布时间（createTime）过滤</td></tr><tr><td>发布状态</td><td>下拉选择</td><td>全部 / 草稿 / 定时待发布 / 已发布 / 已撤回 / 发布失败</td></tr><tr><td>发布人</td><td>人员选择器按钮</td><td>点击弹出通讯录选择器，单选发布人；默认「全部」</td></tr><tr><td>关键字搜索</td><td>文本输入框 + 搜索按钮</td><td>匹配信息标题和表单字段内容，输入后实时过滤</td></tr><tr><td>重置</td><td>按钮</td><td>清空所有筛选条件，恢复默认全量展示</td></tr></tbody></table></div>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.4</span> 操作区</h4>
+<p class="lead"><b>筛选栏右侧放置全局操作按钮：</b></p>
+<p>「<b>📥 导出</b>」按钮：点击展开下拉菜单，提供「<b>横向导出</b>」和「<b>纵向导出</b>」两个快捷入口，选择后打开导出设置弹窗</p>
+<p>「<b>🗑 删除</b>」按钮：批量删除已勾选的记录，红色边框警示；未勾选时点击提示「<b>请先选择要删除的记录</b>」</p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.5</span> 列表字段自定义</h4>
+<p>列表上方提供「<b>列表字段 ▾</b>」入口，点击展开字段筛选面板，选择展示的字段，默认勾选全部模版配置表单的所有字段，取消全选仅展示基础字段</p>
+<p><b>基础字段：信息标题、发布人、发布时间、状态、操作</b></p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.6</span> 分页器</h4>
+<p>默认每页10条，支持切换为20条/50条</p>
+<p><b>分页控件包含：首页、上一页、页码（最多显示5个连续页码）、下一页、末页</b></p>
+<p>支持「<b>跳至 N 页</b>」输入框快速跳转</p>
+<p><b>分页信息显示：共 X 条，当前第 N/M 页，已选 Y 条（有勾选时）</b></p>
+<p>切换筛选条件后自动重置到第1页</p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.8.7</span> 详情</h4>
+<p>点击列表「<b>详情</b>」或标题，进入详情页，只可查看详情不可操作</p>
+<p class="lead"><b>基本信息区：</b></p>
+<p>信息标题 、发布人、发布时间、发布范围、阅读量、最近编辑时间（重新编辑后才有该字段）、撤回时间（有撤回操作才有该字段）、失败原因（发送失败才有该字段）、接收对象</p>
+<p class="lead"><b>内容区：</b></p>
+<p>按模板表单结构展示全部字段值</p>
+<p>图片/文件字段支持点击预览/下载</p>
+<p class="lead"><b>评论区：</b></p>
+<p><b>评论展示：评论人头像、名称、评论时间、评论内容</b></p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.10.11</span> 数据导出</h4>
+<p>点击「<b>导出</b>」按钮后打开「<b>数据导出设置</b>」模态框，配置项如下：</p>
+<div class="tbl-scroll"><table><thead><tr><th>配置项</th><th>说明</th></tr></thead><tbody><tr><td>导出范围</td><td>若已勾选记录，则导出已勾选的 N 条；否则导出当前筛选条件下的全部数据。模态框顶部显示「当前筛选结果共 X 条记录」</td></tr><tr><td>导出方式</td><td>横向导出（默认）：每条发布记录为一行，字段为列；纵向导出：每条记录的字段纵向排列，适合字段较多的模板</td></tr><tr><td>导出格式</td><td>Excel（.xlsx，默认）/ CSV（.csv），二选一</td></tr><tr><td>导出字段</td><td>基础字段：信息标题、发布人、发布时间、状态、发布时间；动态字段：根据导出范围内数据实际使用的模板表单字段自动追加，字段名前缀「字段：」。默认全部勾选，至少选择一个字段</td></tr></tbody></table></div>
+<p class="lead"><b>导出行为：</b></p>
+<p>点击「<b>确认导出</b>」后，前端生成文件并触发浏览器下载，文件命名规则：生产信息数据_YYYY-MM-DD.xlsx（或.csv）</p>
+<p>导出操作自动记录到基础服务平台的下载中心</p>
+<p>导出过程中显示 Toast 提示「<b>正在导出...</b>」，完成后提示「<b>导出成功：文件名</b>」</p>
+<h4><span class="no" style="color:var(--brand);font-variant-numeric:tabular-nums;font-size:13.5px">6.6.10.12</span> 删除</h4>
+<p>勾选一条或多条记录后，点击「<b>🗑 删除</b>」按钮，弹窗提示“信息删除之后无法恢复，确认删除？”</p>
+<p>确认删除后同步删除我发布的消息，</p>
+<p>删除成功后刷新列表，勾选状态清空</p>
+<h2 class="sub" id="s67">6.7 我收到的</h2>
+<h3><span class="no">6.7.1</span>功能概述</h3>
+<p>「<b>我收到的</b>」是信息接收方的核心工作台，展示当前用户作为接收对象收到的全部发布信息。用户可在此按模板筛选、多条件检索、查看详情、标记已读/未读、收藏重要信息，并可将收到的信息复制后重新发布。侧边栏导航项显示未读数角标，帮助用户快速识别待处理信息。端侧支持：PC端 + 移动端（移动端默认首页）。</p>
+<div class="tbl-scroll"><table><thead><tr><th>与「我发布的」区别： 我发布的：展示当前用户作为发布人发出的信息，可修改/撤回 我收到的：展示当前用户作为接收对象收到的信息，可查看/已读/收藏/复制重新发布，不可修改或撤回原信息</th></tr></thead><tbody></tbody></table></div>
+<h3><span class="no">6.7.2</span>页面布局与模板筛选</h3>
+<p><b>页面入口：侧边栏「<b>生产信息发布</b>」→「<b>我收到的</b>」</b></p>
+<p>消息通知：消息发布时在站内信消息中心推送一条通知，点击站内信消息详情可快速跳转到 &quot;我收到的消息详情&quot;,发布失败时需要推送站内信消息</p>
+<p class="lead"><b>模板树筛选：</b></p>
+<p>左侧模板树展示当前用户有权接收的模板，按业务分类 → 模板组（多级）→ 模板层级组织</p>
+<p>点击模板节点，右侧列表自动筛选为该模板的收到记录</p>
+<p>点击模板组节点展开/收起子节点，不触发筛选</p>
+<p>模板搜索框支持按模板组名称、模板名称模糊匹配，搜索结果高亮并自动展开</p>
+<p>未选中模板时，右侧展示全部收到的信息（跨模板），空状态提示「<b>请从左侧选择模板</b>」</p>
+<h3><span class="no">6.7.3</span>多条件筛选</h3>
+<p>右侧筛选区提供以下筛选条件，各条件之间为 AND 关系：</p>
+<div class="tbl-scroll"><table><thead><tr><th>筛选项</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>关键字搜索</td><td>输入框</td><td>按信息标题模糊匹配，输入后实时筛选</td></tr><tr><td>已读状态</td><td>下拉</td><td>全部 / 未读 / 已读，默认全部</td></tr><tr><td>发布人</td><td>人员选择器</td><td>点击打开通讯录选择弹窗（支持组织机构维度/多维组织两个Tab），选择后按钮显示发布人名称，可清空</td></tr><tr><td>系统消息</td><td>复选框</td><td>勾选后仅展示系统自动发布的信息（isSystem=true），如定期发布任务生成的信息</td></tr><tr><td>发布时间范围</td><td>日期范围</td><td>高级筛选弹窗中配置，开始日期至结束日期</td></tr></tbody></table></div>
+<h3><span class="no">6.7.4</span>列表视图与字段自定义</h3>
+<p><b>视图切换：筛选区右侧提供「<b>列表展示</b>」「<b>卡片展示</b>」Tab切换，默认列表视图；</b></p>
+<p class="lead"><b>列表字段：</b></p>
+<p><b>固定列：复选框、信息标题、发布时间、发布者、状态（已读/未读）、操作</b></p>
+<p><b>动态列：根据当前选中模板的表单字段动态生成列，字段值超过30字符截断显示「<b>...</b>」</b></p>
+<p>未选中模板时不展示动态字段列</p>
+<p class="lead"><b>列表字段自定义：</b></p>
+<p>点击「<b>列表字段 ▾</b>」展开列设置面板</p>
+<p>面板中展示当前模板的全部表单字段，复选框勾选控制列的显示/隐藏，默认全部显示</p>
+<p>提供「<b>全部字段</b>」全选/取消全选</p>
+<p>列设置仅对当前模板生效，切换模板后恢复该模板的上次配置</p>
+<p class="lead"><b>列表操作：</b></p>
+<p><b>操作列：详情、收藏/取消收藏（已撤回信息无操作按钮）</b></p>
+<p><b>分页：10/20/50条/页切换，底部显示总条数</b></p>
+<h3><span class="no">6.7.5</span>卡片视图</h3>
+<p>卡片视图以卡片网格形式展示收到的信息，适合快速浏览标题和摘要。</p>
+<p class="lead"><b>卡片结构：</b></p>
+<p><b>头部：发布人+ 发布时间+已读/未读状态标签（可点击切换）</b></p>
+<p><b>标题行：信息标题，已撤回信息显示「<b>已撤回</b>」标签</b></p>
+<p><b>描述区：取前2个表单字段值拼接展示，单值超过40字符截断；</b></p>
+<p><b>底部操作栏：阅读量（👁 人数）、评论数（💬 条数）、收藏按钮（☆/★）</b></p>
+<p>交互：点击卡片标题/描述/底部区域进入详情页；点击状态标签切换已读/未读；点击收藏按钮切换收藏状态（均阻止事件冒泡，不触发详情跳转）。</p>
+<h3><span class="no">6.7.6</span>批量操作</h3>
+<p>支持批量已读/未读操作</p>
+<p><b>全选：表头复选框勾选当前页全部记录，再次点击取消全选</b></p>
+<p><b>已选计数：批量操作栏实时显示「<b>已选 N 项</b>」</b></p>
+<p><b>批量标记已读：选中后点击「<b>标记已读</b>」，将选中的未读信息批量标记为已读，记录已读时间；操作后清空选择并刷新列表</b></p>
+<p>批量操作栏在有选中项时显示，无选中项时隐藏</p>
+<p>阅读时间以最新阅读时间为准</p>
+<h3><span class="no">6.7.7</span>收到详情</h3>
+<p class="lead"><b>基础信息：</b></p>
+<p>发布人、发布时间、最近编辑时间（编辑后才有该字段）</p>
+<p>收藏按钮（ 收藏 / 取消收藏，点击切换）</p>
+<p>阅读量（阅读量接收对象阅读量+通过链接阅读量），点击一次算一次阅读量</p>
+<p>接受对象</p>
+<p class="lead"><b>内容区：</b></p>
+<p>按模板表单结构展示全部字段值</p>
+<p>图片/文件字段支持点击预览/下载</p>
+<p>长文本字段完整展示，不截断</p>
+<p class="lead"><b>评论区：</b></p>
+<p>接收对象和发布人可在详情页发表评论</p>
+<p><b>评论展示：评论人头像、用户名、账号、评论时间、评论内容</b></p>
+<p>支持回复评论、删除自己的评论</p>
+<p><b>详情页操作按钮：复制重新发布、链接分享</b></p>
+<h3><span class="no">6.7.8</span>已读/未读管理</h3>
+<div class="tbl-scroll"><table><thead><tr><th>操作场景</th><th>规则说明</th></tr></thead><tbody><tr><td>打开详情自动标记已读</td><td>点击进入收到详情页时，若信息为未读状态，自动标记为已读并记录已读时间；</td></tr><tr><td>列表手动切换</td><td>列表操作列不提供直接切换入口；卡片视图中点击「已读/未读」状态标签可手动切换，切换后记录或清空已读时间</td></tr><tr><td>批量标记已读</td><td>列表视图勾选多条后点击「标记已读」，批量将未读信息标记为已读</td></tr><tr><td>已读时间记录</td><td>每次标记已读时记录精确到分钟的已读时间，用于阅读情况统计</td></tr></tbody></table></div>
+<h3><span class="no">6.7.9</span>收藏管理</h3>
+<p><b>收藏入口共三处：列表操作列、卡片底部、详情页信息，三处状态实时同步</b></p>
+<p>点击「<b>收藏</b>」后按钮变为「<b>取消收藏</b>」（列表）或「<b>⭐ 已收藏</b>」（详情/卡片）</p>
+<p>收藏的信息同步展示在「<b>我的收藏</b>」模块中（详见6.8节）</p>
+<p>取消收藏后，「<b>我的收藏</b>」中同步移除</p>
+<p>已撤回信息不可收藏，</p>
+<h3><span class="no">6.7.10</span>阅读情况</h3>
+<p>在收到详情页点击「<b>阅读情况</b>」打开弹窗，展示该信息接收对象的阅读状态。</p>
+<p class="lead"><b>弹窗结构：</b></p>
+<p><b>顶部Tab切换：已读（N人）/ 未读（N人）</b></p>
+<p><b>已读列表：展示已读人员头像、用户名、账号、已读时间，按已读时间倒序排列</b></p>
+<p><b>未读列表：展示未读人员头像、账号、用户名</b></p>
+<p>无已读记录时显示「<b>暂无已读记录</b>」；全部已读时未读Tab显示「<b>全部已读</b>」</p>
+<div class="tbl-scroll"><table><thead><tr><th>权限说明：阅读情况仅发布人本人和管理员可查看；普通接收方查看自己收到的信息时，不显示「阅读情况」入口。</th></tr></thead><tbody></tbody></table></div>
+<h3><span class="no">6.7.11</span>复制重新发布</h3>
+<p>在收到详情页点击「<b>复制</b>」按钮，系统将该信息的全部字段值带入发布表单</p>
+<p>发布表单标题显示「<b>复制编辑 - {模板名称}</b>」，信息标题默认沿用原标题，可手动修改</p>
+<p>接收对象沿用模板配置，不继承原信息的接收对象</p>
+<p>用户可在复制内容基础上修改后，执行保存草稿、立即发布或定时发布</p>
+<p>复制操作不影响原信息，原信息的已读状态和收藏状态不变</p>
+<p>适用于基于收到的日志/台账信息快速生成新的发布记录</p>
+<h3><span class="no">6.7.12</span>撤回信息处理</h3>
+<p>发布人撤回信息后，接收方「<b>我收到的</b>」列表中该信息标题后显示「<b>已撤回</b>」标签</p>
+<p>已撤回信息保留在列表中，不自动删除，便于用户追溯历史</p>
+<p>已撤回信息不可查看详情、不可收藏、不可复制重新发布</p>
+<p>若用户在撤回前已打开详情页，撤回后详情页显示「<b>该信息已被发布人撤回</b>」提示，内容区不可见</p>
+<p>若用户在撤回前已经收藏，撤回后在收藏列表显示「<b>已撤回</b>」标签，不可查看详情、不可收藏、不可复制</p>
+<h2 class="sub" id="s68">6.8 我的收藏</h2>
+<h3><span class="no">6.8.1</span>功能概述</h3>
+<p>「<b>我的收藏</b>」模块集中展示当前用户在「<b>我发布的</b>」和「<b>我收到的</b>」中标记为收藏的所有信息，提供统一的收藏内容管理入口。用户可在此快速查找、查看和取消收藏，支持按来源、分类、时间等多维度筛选，并提供列表和卡片两种浏览视图。端侧支持：PC端 + 移动端（移动端底部Tab「<b>我的收藏</b>」）。</p>
+<h3><span class="no">6.8.2</span>页面入口</h3>
+<p><b>页面入口：侧边栏「<b>生产信息发布</b>」→「<b>我的收藏</b>」</b></p>
+<p><b>收藏入口共三处：「<b>我发布的</b>」列表操作列/详情页、「<b>我收到的</b>」列表操作列/卡片底部/详情页，三处收藏状态实时同步</b></p>
+<h3><span class="no">6.8.3</span>筛选区</h3>
+<p>页面顶部筛选栏包含以下筛选项，各条件之间为 AND 关系：</p>
+<div class="tbl-scroll"><table><thead><tr><th>筛选项</th><th>控件类型</th><th>说明</th></tr></thead><tbody><tr><td>关键字搜索</td><td>文本输入框 + 搜索按钮</td><td>按信息标题模糊匹配，输入后实时过滤</td></tr><tr><td>收藏时间</td><td>日期范围选择器</td><td>开始时间 ~ 结束时间，按收藏操作时间过滤</td></tr><tr><td>来源</td><td>下拉选择</td><td>全部 / 我发布的 / 我收到的</td></tr><tr><td>分类</td><td>下拉选择</td><td>全部分类 / 具体收藏的消息来源业务分类（如动力能源部/制水车间、动力能源部/煤气车间、轧钢生产等）</td></tr></tbody></table></div>
+<h3><span class="no">6.8.4</span>视图切换</h3>
+<p>筛选栏下方提供视图切换标签，支持两种展示模式：</p>
+<p><b>列表展示（默认）：以表格形式展示收藏内容，信息密度高，适合快速浏览和批量管理</b></p>
+<p><b>卡片展示：以卡片形式展示，包含发布人、字段摘要等更多信息，适合内容预览</b></p>
+<p>切换视图时保留当前筛选条件和搜索结果</p>
+<p><b>右侧显示当前筛选结果总数：「<b>共 X 条</b>」</b></p>
+<h3><span class="no">6.8.5</span>列表视图</h3>
+<p class="lead"><b>列表视图字段结构如下：</b></p>
+<div class="tbl-scroll"><table><thead><tr><th>列名</th><th>说明</th></tr></thead><tbody><tr><td>标题</td><td>标题后附带来源标签（「我发布的」/「我收到的」）</td></tr><tr><td>分类</td><td>业务分类路径，如「动力能源部/制水车间」，无分类时显示「-」</td></tr><tr><td>来源</td><td>「我发布的」或「我收到的」</td></tr><tr><td>发布人</td><td>发布人姓名，无则显示「-」</td></tr><tr><td>收藏时间</td><td>信息收藏时间，格式 YYYY-MM-DD HH:mm:ss</td></tr><tr><td>发布时间</td><td>信息发布时间，格式 YYYY-MM-DD HH:mm:ss</td></tr><tr><td>操作</td><td>「详情」链接：跳转到对应来源的详情页；「取消收藏」链接：取消该条收藏，取消后从列表中移除</td></tr></tbody></table></div>
+<h3><span class="no">6.8.6</span>卡片视图</h3>
+<p>卡片视图以响应式网格排列，每张卡片包含以下元素：</p>
+<p><b>卡片头部：发布人头像（取姓名首字）、发布人姓名、发布时间、来源标签（右上角）</b></p>
+<p><b>信息标题：加粗显示，定时发布的信息附加「<b>定时</b>」标签</b></p>
+<p><b>内容摘要：取该模板前两个表单字段的值进行预览，单个字段值超过40字符时截断并显示「<b>...</b>」</b></p>
+<p><b>卡片底部：左侧显示业务分类（📂图标 + 分类名），右侧显示「<b>★ 取消收藏</b>」按钮（橙色文字）</b></p>
+<p>点击卡片主体区域跳转到对应来源的详情页；点击「<b>取消收藏</b>」按钮时阻止事件冒泡，仅执行取消收藏操作</p>
+<h3><span class="no">6.8.7</span>空状态</h3>
+<p>当用户没有任何收藏内容，或当前筛选条件下无匹配结果时，显示空状态</p>
+<p><b>空状态展示：「<b>暂无收藏内容</b>」文字提示</b></p>
+<p>引导用户前往「<b>我发布的</b>」或「<b>我收到的</b>」模块进行收藏操作</p>
+<h3><span class="no">6.8.8</span>操作与交互</h3>
+<p>查看详情：点击标题、卡片主体或「<b>详情</b>」链接，根据来源字段跳转到对应模块的详情页（来源为「<b>我发布的</b>」则打开发布详情，来源为「<b>我收到的</b>」则打开收到详情）</p>
+<p class="lead"><b>取消收藏：</b></p>
+<p><b>列表视图：点击操作列「<b>取消收藏</b>」链接</b></p>
+<p><b>卡片视图：点击卡片底部「<b>★ 取消收藏</b>」按钮</b></p>
+<p>取消后显示 Toast 提示「<b>已取消收藏</b>」，列表实时刷新，该条记录从当前视图移除</p>
+<p>取消收藏后，「<b>我发布的</b>」和「<b>我收到的</b>」中对应记录的收藏按钮状态同步更新为未收藏</p>
+<p>已撤回的信息不可收藏，若收藏后被发布人撤回，该记录仍保留在收藏列表中，不可查看详情</p>
+<h3><span class="no">6.8.9</span>数据来源与同步机制</h3>
+<p><b>收藏数据合并自两个来源：「<b>我发布的</b>」中用户收藏的记录 + 「<b>我收到的</b>」中用户收藏的记录</b></p>
+<p>每条收藏记录包含 source 字段标识来源（published / received），用于详情页跳转路由</p>
+<p>收藏状态在以下位置实时同步：「<b>我的收藏</b>」列表、「<b>我发布的</b>」列表/详情、「<b>我收到的</b>」列表/卡片/详情，任意一处收藏/取消收藏，其余位置状态即时更新</p>
+<p>收藏操作记录收藏时间，用于「<b>收藏时间</b>」筛选</p>
+<p>收藏数据按用户隔离，每位用户仅能查看和管理自己的收藏内容</p>
+<p>|（注：部分内容可能由 AI 生成）</p>
+</section>
+
+      <div class="doc-foot">
+        <span class="note-inline">（注：部分内容可能由 AI 生成）</span>
+        <span>生产信息发布平台 PRD · V1.2 · 2026-09-04 · 由 Word 文档源文件渲染生成</span>
+      </div>
+
+    </div>
+  </main>
+</div>
+<button class="totop" id="toTop" aria-label="回到顶部">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+<script>
+/* ===== 交互：进度 / 滚动高亮 / 抽屉 / 回到顶部 ===== */
+var progress=document.getElementById('progress');
+var toTop=document.getElementById('toTop');
+var sidebar=document.getElementById('sidebar');
+var scrim=document.getElementById('scrim');
+var menuBtn=document.getElementById('menuBtn');
+var tocLinks=Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+var sections=tocLinks.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+
+function onScroll(){
+  var st=document.documentElement.scrollTop||document.body.scrollTop;
+  var h=document.documentElement.scrollHeight-window.innerHeight;
+  progress.style.width=(h>0?(st/h*100):0)+'%';
+  toTop.classList.toggle('show',st>400);
+  var cur=0;
+  sections.forEach(function(sec,i){
+    if(sec.offsetTop-140<=st) cur=i;
+  });
+  tocLinks.forEach(function(a,i){a.classList.toggle('active',i===cur)});
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
+
+function toggleNav(open){
+  sidebar.classList.toggle('open',open);
+  scrim.classList.toggle('show',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+menuBtn.addEventListener('click',function(){toggleNav(!sidebar.classList.contains('open'))});
+scrim.addEventListener('click',function(){toggleNav(false)});
+tocLinks.forEach(function(a){a.addEventListener('click',function(){toggleNav(false)})});
+toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>

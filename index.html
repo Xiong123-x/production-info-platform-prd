@@ -459,7 +459,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
                 <td rowspan="3"><b>业务分类管理</b></td>
                 <td>分类列表</td><td>展示全部分类，按新建时间先后排序</td>
               </tr>
-              <tr><td>新增 / 编辑分类</td><td>分类名称（必填，≤30 字，唯一）、分类编码（必填，≤30 字，唯一）</td></tr>
+              <tr><td>新增 / 编辑分类</td><td>分类名称（必填，≤200 字，唯一）、分类编码（必填，≤50 字，唯一）</td></tr>
               <tr><td>删除分类</td><td>二次确认，删除后不可恢复；分类下存在模板组时禁止删除</td></tr>
 
               <tr>
@@ -601,11 +601,11 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
             <thead><tr><th style="width:130px">字段</th><th style="width:80px">必填</th><th style="width:110px">长度限制</th><th>规则说明</th></tr></thead>
             <tbody>
               <tr>
-                <td><b>分类名称</b></td><td><span class="req">是</span></td><td>≤ 30 字</td>
+                <td><b>分类名称</b></td><td><span class="req">是</span></td><td>≤ 200 字</td>
                 <td>名称不可重复；支持中英文、数字、特殊字符</td>
               </tr>
               <tr>
-                <td><b>分类编码</b></td><td><span class="req">是</span></td><td>≤ 30 字</td>
+                <td><b>分类编码</b></td><td><span class="req">是</span></td><td>≤ 50 字</td>
                 <td>全局唯一；支持自动生成和手动输入，手动输入仅允许 大写字母、数字、下划线（<span class="mono">_</span>）、中划线（<span class="mono">-</span>）；自动生成规则 <span class="mono">C + YYMMDD + 4位流水</span>；创建后不可修改</td>
               </tr>
             </tbody>
@@ -659,7 +659,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
             <thead><tr><th style="width:130px">字段</th><th style="width:80px">必填</th><th style="width:110px">长度限制</th><th>规则说明</th></tr></thead>
             <tbody>
               <tr>
-                <td><b>模版组名称</b></td><td><span class="req">是</span></td><td>≤ 50 字</td>
+                <td><b>模版组名称</b></td><td><span class="req">是</span></td><td>≤ 200 字</td>
                 <td>同一业务分类下名称不可重复</td>
               </tr>
               <tr>
@@ -679,21 +679,27 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <ul>
           <li>点击模板节点，右侧展示该模板详情</li>
           <li>当前选中模板高亮显示</li>
-          <li>悬停显示「⋯」操作菜单：定期模版、正常模版、已停用模版操作包含 编辑、复制、停用 / 启用、删除；草稿模版操作菜单：编辑、复制、发布、删除</li>
+          <li>悬停显示「⋯」操作菜单：启用模版、草稿模版、已停用模版操作包含：编辑、复制、停用 / 启用、删除，草稿模版操作菜单：编辑、复制、发布、删除</li>
           <li>模版标签：暂存模版后有「草稿」标签，设置了定期任务有「定期」标签</li>
-          <li>已停用模板默认隐藏，每个模板组下有「展示已停用模版」复选框，勾选后显示该组下已停用模板（灰色文字 + 「已停用」标签）</li>
+          <li>已停用模板默认隐藏，每个模板组下有「展示已停用模版」复选框，勾选后显示该组下已停用模板（灰色文字）</li>
+          <li>模版停用后在【我发布的】发布消息时不能被引用，仅支持查看停用模版下的历史发布列表，支持查看、收藏、删除历史引用该模版发布的消息</li>
         </ul>
 
         <h3><span class="no">6.2.5</span>模板详情</h3>
         <h4>头部操作区</h4>
         <ul>
           <li>模板名称 + 状态标签（<span class="tag ok">正常</span><span class="tag gray">已停用</span><span class="tag warn">草稿</span><span class="tag info">定期</span>）</li>
-          <li>操作按钮：编辑、复制、停用 / 启用、发布（根据当前状态切换文案）</li>
+          <li>已启用模版详情页：编辑、复制、停用</li>
+          <li>编辑已启用模版：预览、发布</li>
+          <li>已停用模版详情页：编辑、复制、启用、删除</li>
+          <li>编辑已停用模版：暂存、预览、发布，暂存后还是停用状态</li>
+          <li>草稿模版详情页：编辑、复制、删除、发布</li>
         </ul>
         <h4>基本信息区</h4>
         <div class="tbl-scroll">
           <table style="min-width:420px">
             <tbody>
+              <tr><td style="width:130px;background:#FAFBFD"><b>模版名称</b></td><td>交接班日志 + 状态（启用 / 停用 / 草稿）</td><td style="width:130px;background:#FAFBFD"></td><td></td></tr>
               <tr><td style="width:130px;background:#FAFBFD"><b>模版编码</b></td><td><span class="mono">TPL-JBJRZ-001</span></td><td style="width:130px;background:#FAFBFD"><b>模版路径</b></td><td>动力能源部 / 制水车间</td></tr>
               <tr><td style="background:#FAFBFD"><b>创建时间</b></td><td>2024-05-26 12:36</td><td style="background:#FAFBFD"><b>最近更新时间</b></td><td>2026-08-21 10:18</td></tr>
             </tbody>
@@ -704,7 +710,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <table>
             <thead><tr><th style="width:120px">配置项</th><th>内容</th></tr></thead>
             <tbody>
-              <tr><td><b>接收对象</b></td><td>显示「指定人员」或「发起人自选」；指定人员模式下标注「发起人发布的信息将送给指定成员，不能修改」</td></tr>
+              <tr><td><b>接收对象</b></td><td>显示「指定人员」或「发起人自选」；指定人员模式下标注「发起人发布的信息将送给指定成员，不能修改」；发起人自选模式下标注「发布信息时，由发起人自主指定该信息的接收成员」</td></tr>
               <tr><td><b>组织人员</b></td><td>以标签形式展示，点击「修改」打开通讯录选择器</td></tr>
               <tr><td><b>当班人员</b></td><td>以标签形式展示，未配置时显示「--」，点击「修改」打开通讯录选择器</td></tr>
             </tbody>
@@ -743,7 +749,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
             <thead><tr><th style="width:130px">字段</th><th style="width:80px">必填</th><th style="width:110px">长度限制</th><th>规则说明</th></tr></thead>
             <tbody>
               <tr>
-                <td><b>模版名称</b></td><td><span class="req">是</span></td><td>≤ 50 字</td><td>同一模板组下名称不可重复</td>
+                <td><b>模版名称</b></td><td><span class="req">是</span></td><td>≤ 200 字</td><td>同一模板组下名称不可重复</td>
               </tr>
               <tr>
                 <td><b>模版编码</b></td><td><span class="req">是</span></td><td>≤ 50 字</td>
@@ -1032,13 +1038,13 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         </ul>
 
         <h4>属性面板</h4>
+        <div class="note blue">手机端不支持设置标题样式、标题对齐方式；PC 端统一标题样式和标题对齐方式，修改其中一个组件，另外的组件同步修改。</div>
         <p>选中画布中组件后，右侧展示该组件的属性配置，通用属性包括：</p>
         <ul>
           <li><strong>字段名称：</strong>表单中显示的标签文字</li>
-          <li><strong>占位提示：</strong>输入框 placeholder 文字</li>
+          <li><strong>提示文字：</strong>输入框提示文字</li>
           <li><strong>是否必填：</strong>开关控制，必填字段发布时校验</li>
           <li><strong>默认值：</strong>可配置固定默认值或公式计算</li>
-          <li><strong>显示条件：</strong>配置字段的显示 / 隐藏逻辑（基于其他字段值）</li>
         </ul>
         <p>各组件特有属性：</p>
         <ul>
@@ -1069,7 +1075,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
             <tbody>
               <tr>
                 <td><b>内容发布后允许发布者修改</b></td><td><span class="tag gray">关闭</span></td>
-                <td>开启后可配置：允许修改时限（分钟 / 小时 / 天），默认 30 分钟 + 允许修改的字段（从表单字段中多选）</td>
+                <td>开启后可配置：允许修改时限（分钟 / 小时 / 天），默认 30 分钟 + 允许修改的字段（从表单字段中多选、默认模版表单设计的全部字段可修改，不可修改接收对象）</td>
               </tr>
               <tr>
                 <td><b>发布内容后允许发布者撤回</b></td><td><span class="tag ok">开启</span></td>
@@ -1081,36 +1087,47 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
 
         <h3><span class="no">6.3.5</span>高级设置 — 定期发布</h3>
         <ul>
-          <li>总开关：默认关闭，开启后显示规则配置区，提示“设置发布周期后，系统将按此规律自动执行，无需重复手动操作”</li>
+          <li>总开关：默认关闭，开启后显示规则配置区，提示“设置发布周期后，需要指定接收对象，系统将按此规律自动执行，无需重复手动操作”</li>
+          <li>只有接收对象是【指定成员】时才会出现</li>
+          <li>执行周期规则类型：按照 Cron 表达式组件，设置时、天、周、月</li>
         </ul>
         <h4>规则类型（四选一）</h4>
         <div class="tbl-scroll">
           <table>
             <thead><tr><th style="width:140px">规则类型</th><th>配置项</th></tr></thead>
             <tbody>
-              <tr><td><b>每隔一段时间</b></td><td>间隔数值 + 单位（秒 / 分钟 / 小时）；如「每隔 2 小时」，最短时间间隔 60 秒、5 分钟、1 小时</td></tr>
+              <tr><td><b>按小时</b></td><td>间隔数值 + 单位（小时）；如「每隔 2 小时」，最短时间间隔 1 小时</td></tr>
               <tr><td><b>按天</b></td><td>每天固定时间点（可添加多个时间点，如 08:00、20:00）</td></tr>
               <tr><td><b>按周</b></td><td>选择星期几（可多选）+ 固定时间点（可多个）</td></tr>
               <tr><td><b>按月</b></td><td>选择每月几号（可多选）+ 固定时间点（可多个）</td></tr>
             </tbody>
           </table>
         </div>
-        <p>定期发布开启后，系统将按规则自动创建发布任务，使用模板的表单结构和默认值生成信息并发送给配置的接收对象。发布人可在「我发布的」中查看定期发布的历史记录。</p>
+        <div class="note">
+          <p>定期发布开启后，系统将按规则自动创建发布任务，使用模板的表单结构和默认值生成信息并发送给配置的接收对象。发布人可在「我发布的」中查看定期发布的历史记录。</p>
+          <p>定期发布默认关闭状态，只有在接收对象设置了【指定成员】才有定期发布设置。</p>
+        </div>
 
         <h3><span class="no">6.3.6</span>高级设置 — 外部共享</h3>
-        <p>通过链接或二维码将模板的发布数据对外共享，无需登录平台即可查看。支持查看人按标题关键字搜索、支持筛选发布时间、发布状态筛选数据、支持导出数据。</p>
+        <p>通过链接或二维码将引用模板的发布数据对外共享，无需登录平台即可查看。支持查看人按标题关键字搜索、支持筛选发布时间、发布状态筛选数据。</p>
         <div class="tbl-scroll">
           <table>
             <thead><tr><th style="width:140px">配置项</th><th>说明</th></tr></thead>
             <tbody>
-              <tr><td><b>共享链接</b></td><td>系统自动生成唯一链接，支持一键复制；支持下载二维码图片</td></tr>
-              <tr><td><b>共享字段</b></td><td>从表单字段中多选，仅选中的字段在共享页面展示；未选择时提示「去选择」</td></tr>
+              <tr><td><b>共享链接</b></td><td>用户点击【确认】系统自动生成唯一链接和二维码，支持一键复制；支持下载二维码图片</td></tr>
+              <tr><td><b>共享字段</b></td><td>从表单字段中多选，仅选中的字段在共享页面展示；默认选中展示全部字段</td></tr>
               <tr><td><b>数据范围</b></td><td>单选：全部 / 近一年 / 近半年 / 近一个月（默认近一个月）</td></tr>
-              <tr><td><b>链接有效期</b></td><td>单选：永久 / 24 小时 / 七天 / 一个月 / 自定义（选择到期日）；过期后链接自动失效</td></tr>
+              <tr><td><b>链接有效期</b></td><td>单选：永久 / 24 小时 / 七天 / 一个月 / 自定义（选择到期日）；过期后链接自动失效，默认永久</td></tr>
             </tbody>
           </table>
         </div>
-        <p>支持新增多个共享配置，每个共享配置生成独立链接和二维码，可分别设置字段和范围。</p>
+        <p>支持新增多个共享配置，每个共享配置生成独立链接和二维码，可分别设置字段、范围、链接有效期。</p>
+        <div class="note">
+          <p>当用户修改共享字段、数据范围、链接有效期，需要再次点击【确认】生成新的链接，原链接和二维码失效。</p>
+          <p>删除共享后，链接和二维码失效。</p>
+          <p>修改表单设计后，没有重新设置外部共享，不影响原链接和二维码，用户打开链接后查看的消息列表字段还是原设置的共享字段，如：表单设计原有 A、B、C 字段，共享字段设置了全部 A、B、C，再次修改了表单设计 B、C、D，在没有重新设置共享字段的情况下看到的还是 A、B、C。</p>
+          <p>草稿状态的共享链接无效。</p>
+        </div>
       </section>
       <!-- ===== 6.6 信息发布 ===== -->
       <section class="section" id="s66">
@@ -1131,7 +1148,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <li>左侧模板树中点击某个模板节点，右侧列表自动筛选为该模板的发布记录</li>
           <li>选中模板后，右侧列表顶部出现「+ 发布信息」按钮，点击进入发布表单页面</li>
           <li>未选中模板时，「+ 发布信息」按钮不显示，提示「请先在左侧选择模板」</li>
-          <li>已停用模板不在发布入口的模板树中展示（仅模板管理中可见）</li>
+          <li>已停用模板仅支持查看历史发布信息列表和信息详情，不支持引用停用模版发布消息，不支持复制已停用模版发布的消息</li>
         </ul>
 
         <h3><span class="no">6.6.3</span>发布表单填写</h3>
@@ -1143,7 +1160,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
             <tbody>
               <tr>
                 <td><b>信息标题</b></td><td><span class="req">必填</span></td>
-                <td>单行输入框，≤ 100 字；默认自动填充为「模板名称 + 当前日期」，可手动修改</td>
+                <td>单行输入框，最长 200 字符；默认自动填充为「模板名称 + 当前日期」，可手动修改</td>
               </tr>
               <tr>
                 <td><b>模板字段区</b></td><td>视模板配置</td>
@@ -1155,7 +1172,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
               </tr>
               <tr>
                 <td><b>接收对象</b></td><td><span class="req">必填</span></td>
-                <td>沿用模板配置，发布时不可修改：指定成员模式下展示固定接收人列表；发起人自选模式下展示通讯录选择器，由发布人选择接收对象</td>
+                <td>沿用模板配置，发布时不可修改，指定成员模式下展示固定接收人；发起人自选模式，由发布人选择接收对象组织人员、当班人员</td>
               </tr>
             </tbody>
           </table>
@@ -1168,17 +1185,23 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
               <tr><td><b>保存草稿</b></td><td>保存当前填写内容为草稿状态，不发送给接收对象；草稿可在「我发布的」列表中继续编辑</td></tr>
               <tr><td><b>发布</b></td><td>校验必填项后立即发布，信息发送给接收对象；发布后状态为「已发布」</td></tr>
               <tr><td><b>定时发布</b></td><td>点击展开定时配置面板，选择发布时间后保存，状态为「定时待发布」，到点自动发布</td></tr>
+              <tr><td><b>预览</b></td><td>支持切换手机端、电脑端查看</td></tr>
             </tbody>
           </table>
         </div>
         <p><b>编辑模式差异：</b>编辑已发布信息时，底部按钮变为「更新发布」「预览」；仅模板配置中允许修改的字段可编辑，其余字段只读展示。</p>
         <h4>复制已发布信息</h4>
         <ul>
-          <li>在发布信息页面，点击「复制已发布信息」按钮，弹出同模板历史已发布记录列表</li>
+          <li>在发布信息页面，点击「复制已发布信息」按钮，弹出同模板自己历史已发布记录列表</li>
           <li>列表展示：信息标题、发布时间，支持按标题搜索</li>
           <li>选择一条记录后，该记录的全部字段值回填到当前表单中，信息标题自动追加「- 副本」后缀</li>
           <li>用户可在复制内容基础上修改后发布，适用于重复性日志 / 台账类场景</li>
           <li>复制操作不影响原记录</li>
+          <li>复制已发布消息，回填内容以最新模版内容为准，如历史模版表单有 A、B、C、D，最新模版表单只有 A、B、C，复制后只回填 A、B、C 内容</li>
+        </ul>
+        <h4>获取数据</h4>
+        <ul>
+          <li>模版中设置了从数据源中获取数据，在发布消息时可以点击【获取数据】刷新最新数据填写</li>
         </ul>
 
         <h3><span class="no">6.6.4</span>定时发布与定期发布</h3>
@@ -1191,8 +1214,8 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         </ul>
         <h4>定期发布（周期）</h4>
         <ul>
-          <li>仅当模板的高级设置中开启了「定期发布」时，发布表单中显示「定期发布」入口</li>
-          <li>定期发布规则沿用模板配置（间隔 / 天 / 周 / 月），发布时不可修改</li>
+          <li>仅当模板的高级设置中开启了「定期发布」时，发布列表中切换才显示「定期发布」列表内容</li>
+          <li>定期发布规则沿用模板配置（小时 / 天 / 周 / 月），发布时不可修改</li>
           <li>首次发布后，系统按规则自动创建后续发布任务，每次执行使用当前表单内容的快照</li>
         </ul>
 
@@ -1202,6 +1225,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <table>
             <thead><tr><th style="width:130px">筛选项</th><th>说明</th></tr></thead>
             <tbody>
+              <tr><td><b>发布类型</b></td><td>单次发布、周期发布，默认选中单次发布</td></tr>
               <tr><td><b>发布时间</b></td><td>日期范围选择器，默认近 30 天</td></tr>
               <tr>
                 <td><b>发布状态</b></td><td>下拉单选，默认全部<br><span class="sub">单次发布：全部、草稿、定时待发布、已发布、已撤回、发布失败</span><br><span class="sub">周期发布：全部、草稿、已发布、已撤回、发布失败</span></td>
@@ -1227,7 +1251,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
                 <td><span class="tag ok">已发布</span></td><td>详情、复制、收藏、编辑、撤回</td>
                 <td>编辑、撤回，需要在模版管理中设置了允许编辑、允许撤回才有该按钮，超过编辑、撤回时效，按钮置灰，并提示“已超过编辑 / 撤回时间”</td>
               </tr>
-              <tr><td><span class="tag gray">已撤回</span></td><td>详情、复制、编辑、删除、收藏</td><td></td></tr>
+              <tr><td><span class="tag gray">已撤回</span></td><td>详情、复制、删除、收藏</td><td></td></tr>
               <tr><td><span class="tag danger">发送失败</span></td><td>详情、复制、编辑、删除、收藏</td><td></td></tr>
             </tbody>
           </table>
@@ -1235,6 +1259,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <ul>
           <li>支持复制消息，复制后全部字段值回填到新表单中，信息标题自动追加「- 副本」后缀，复制操作不影响原纪录</li>
           <li>支持收藏消息</li>
+          <li>站内信消息：发布成功、修改后发布、撤回、删除推送站内信消息；接收对象当班人员和组织人员都有同一个人时，站内信只推送一条消息</li>
           <li>分页：10 / 20 / 50 条 / 页切换</li>
         </ul>
 
@@ -1242,7 +1267,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <h4>基本信息区</h4>
         <ul>
           <li>信息标题、发布人、发布时间、发布范围、阅读量、最近编辑时间（重新编辑后才有该字段）、撤回时间（有撤回操作才有该字段）、失败原因（发送失败才有该字段）、接收对象</li>
-          <li>阅读量大于接收人数量，可通过链接分享给其他用户，不需要登录平台可查看消息详情页，一个用户算一次阅读量</li>
+          <li>阅读量大于接收人数量，可通过链接分享给其他用户，不需要登录平台可查看消息详情页，点击一次算一次阅读量</li>
         </ul>
         <h4>内容区</h4>
         <ul>
@@ -1255,14 +1280,28 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <li>评论展示：评论人头像、名称、评论时间、评论内容</li>
           <li>支持回复评论、删除自己的评论</li>
         </ul>
+        <h4>阅读情况</h4>
+        <p>详情页点击「阅读情况」打开弹窗，展示该信息接收对象的阅读状态。</p>
+        <ul>
+          <li>顶部 Tab 切换：已读（N 人）/ 未读（N 人）</li>
+          <li><strong>已读列表：</strong>展示已读人员头像、用户名、账号、已读时间，按已读时间倒序排列</li>
+          <li><strong>未读列表：</strong>展示未读人员头像、账号、用户名</li>
+          <li>无已读记录时显示「暂无已读记录」；全部已读时未读 Tab 显示「全部已读」</li>
+        </ul>
+        <p><b>权限说明：</b>阅读情况仅发布人本人和管理员可查看；普通接收方查看自己收到的信息时，不显示「阅读情况」入口。</p>
 
         <h3><span class="no">6.6.7</span>发布后操作</h3>
         <h4>编辑已发布信息</h4>
         <ul>
           <li>仅当模板配置中「内容发布后允许发布者修改」为开启时，详情页显示「编辑」按钮</li>
+          <li>编辑页面：编辑页面只有「复制已发布消息」「预览」「更新并发布」操作</li>
           <li>编辑受时限限制：超过模板配置的允许修改时限后，「编辑」按钮置灰不可点击</li>
           <li>编辑时仅模板配置中「允许编辑的字段」可编辑，其余字段只读</li>
-          <li>编辑保存后，接收对象收到更新通知，详情页展示编辑记录（编辑时间）</li>
+          <li>编辑后更新发布，接收对象收到更新通知，详情页展示编辑记录（编辑时间）</li>
+        </ul>
+        <h4>编辑定时待发布信息</h4>
+        <ul>
+          <li>编辑页面：编辑页面只有「复制已发布消息」「预览」「保存并更新」操作</li>
         </ul>
         <h4>撤回已发布信息</h4>
         <ul>
@@ -1271,6 +1310,10 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <li>点击「撤回」弹出二次确认，提示「撤回后接收对象将无法查看该信息」</li>
           <li>撤回成功后，信息状态变为「已撤回」，接收对象端该信息标记为已撤回且不可查看详情</li>
           <li>撤回操作不可撤销</li>
+        </ul>
+        <h4>发布失败信息</h4>
+        <ul>
+          <li>编辑发布失败信息：编辑页面只有「复制已发布消息」「预览」「更新并发布」操作</li>
         </ul>
         <h4>查看阅读情况</h4>
         <ul><li>查看接收人中的阅读情况，已读人员和未读人员列表展示</li></ul>
@@ -1284,7 +1327,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <h4><span class="no">6.6.8.2</span>页面权限及操作</h4>
         <ul>
           <li>权限控制：管理员角色可操作全量数据；普通用户显示自己发布的数据</li>
-          <li>删除：支持单条 / 批量删除，二次确认后执行，只删除记录</li>
+          <li>删除：支持单条 / 批量删除，二次确认后执行</li>
           <li>导出：支持单条 / 批量导出，导出时可设置导出字段，支持横向 / 纵向导出，支持导出 Excel / csv 格式</li>
           <li>端侧支持：仅 PC 端，移动端无该模块入口</li>
         </ul>
@@ -1352,13 +1395,13 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <li>点击「确认导出」后，前端生成文件并触发浏览器下载，文件命名规则：生产信息数据_YYYY-MM-DD.xlsx（或 .csv）</li>
           <li>导出操作自动记录到基础服务平台的下载中心</li>
           <li>导出过程中显示 Toast 提示「正在导出...」，完成后提示「导出成功：文件名」</li>
+          <li>导出后显示文件压缩包，导出信息内上传的图片、文件、音视频、填写的内容表单，列表中的图片、文件、音视频列表显示相应的名称</li>
         </ul>
 
         <h4><span class="no">6.6.10.12</span>批量删除</h4>
         <ul>
-          <li>勾选一条或多条记录后，点击「🗑 删除」按钮</li>
-          <li>弹出二次确认弹窗，显示即将删除的记录数量</li>
-          <li>确认后删除选中记录，仅删除记录，不影响我发布的记录</li>
+          <li>勾选一条或多条记录后，点击「🗑 删除」按钮，弹窗提示「信息删除之后无法恢复，确认删除？」</li>
+          <li>确认删除后同步删除我发布的消息</li>
           <li>删除成功后刷新列表，勾选状态清空</li>
         </ul>
       </section>
@@ -1438,10 +1481,12 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <h3><span class="no">6.7.6</span>批量操作</h3>
         <p>列表视图下支持批量操作，卡片视图不支持。</p>
         <ul>
+          <li><strong>支持批量已读 / 未读操作</strong></li>
           <li><strong>全选：</strong>表头复选框勾选当前页全部记录，再次点击取消全选</li>
           <li><strong>已选计数：</strong>批量操作栏实时显示「已选 N 项」</li>
           <li><strong>批量标记已读：</strong>选中后点击「标记已读」，将选中的未读信息批量标记为已读，记录已读时间；操作后清空选择并刷新列表</li>
           <li>批量操作栏在有选中项时显示，无选中项时隐藏</li>
+          <li>阅读时间以最新阅读时间为准</li>
         </ul>
 
         <h3><span class="no">6.7.7</span>收到详情</h3>
@@ -1449,7 +1494,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <ul>
           <li>发布人、发布时间、最近编辑时间（编辑后才有该字段）</li>
           <li>收藏按钮（收藏 / 取消收藏，点击切换）</li>
-          <li>阅读量（接收对象阅读量 + 通过链接阅读量）</li>
+          <li>阅读量（接收对象阅读量 + 通过链接阅读量），点击一次算一次阅读量</li>
           <li>接受对象</li>
         </ul>
         <h4>内容区</h4>
@@ -1461,7 +1506,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <h4>评论区</h4>
         <ul>
           <li>接收对象和发布人可在详情页发表评论</li>
-          <li>评论展示：评论人头像、名称、评论时间、评论内容</li>
+          <li>评论展示：评论人头像、用户名、账号、评论时间、评论内容</li>
           <li>支持回复评论、删除自己的评论</li>
         </ul>
         <p><b>详情页操作按钮：</b>复制重新发布、链接分享</p>
@@ -1474,8 +1519,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
               <tr><td><b>打开详情自动标记已读</b></td><td>点击进入收到详情页时，若信息为未读状态，自动标记为已读并记录已读时间</td></tr>
               <tr><td><b>列表手动切换</b></td><td>列表操作列不提供直接切换入口；卡片视图中点击「已读 / 未读」状态标签可手动切换，切换后记录或清空已读时间</td></tr>
               <tr><td><b>批量标记已读</b></td><td>列表视图勾选多条后点击「标记已读」，批量将未读信息标记为已读</td></tr>
-              <tr><td><b>未读视觉标识</b></td><td>列表中未读行加粗 + 浅蓝背景；卡片中未读卡片左侧蓝色边框；侧边栏导航项显示未读数角标</td></tr>
-              <tr><td><b>已读时间记录</b></td><td>每次标记已读时记录精确到分钟的已读时间，用于阅读情况统计</td></tr>
+                            <tr><td><b>已读时间记录</b></td><td>每次标记已读时记录精确到分钟的已读时间，用于阅读情况统计</td></tr>
             </tbody>
           </table>
         </div>
@@ -1489,22 +1533,10 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
           <li>已撤回信息不可收藏</li>
         </ul>
 
-        <h3><span class="no">6.7.10</span>阅读情况</h3>
-        <p>在收到详情页点击「阅读情况」打开弹窗，展示该信息接收对象的阅读状态。</p>
-        <h4>弹窗结构</h4>
-        <ul>
-          <li>顶部 Tab 切换：已读（N 人）/ 未读（N 人）</li>
-          <li><strong>已读列表：</strong>展示已读人员头像、名称、已读时间，按已读时间倒序排列</li>
-          <li><strong>未读列表：</strong>展示未读人员头像、名称</li>
-          <li>无已读记录时显示「暂无已读记录」；全部已读时未读 Tab 显示「全部已读」</li>
-        </ul>
-        <p><b>权限说明：</b>阅读情况仅发布人本人和管理员可查看；普通接收方查看自己收到的信息时，不显示「阅读情况」入口。</p>
-
         <h3><span class="no">6.7.11</span>复制重新发布</h3>
         <ul>
           <li>在收到详情页点击「复制」按钮，系统将该信息的全部字段值带入发布表单</li>
-          <li>发布表单标题显示「复制编辑 - {模板名称}」，信息标题默认沿用原标题，可手动修改</li>
-          <li>接收对象沿用模板配置，不继承原信息的接收对象</li>
+          <li>接收对象继承原信息的接收对象，自定义接收人支持修改</li>
           <li>用户可在复制内容基础上修改后，执行保存草稿、立即发布或定时发布</li>
           <li>复制操作不影响原信息，原信息的已读状态和收藏状态不变</li>
           <li>适用于基于收到的日志 / 台账信息快速生成新的发布记录</li>
@@ -1577,7 +1609,7 @@ td.col-hl{background:var(--brand-tint);font-weight:600;color:var(--brand-deep)}
         <p>卡片视图以响应式网格排列，每张卡片包含以下元素：</p>
         <ul>
           <li><strong>卡片头部：</strong>发布人头像（取姓名首字）、发布人姓名、发布时间、来源标签（右上角）</li>
-          <li><strong>信息标题：</strong>加粗显示，定时发布的信息附加「定时」标签</li>
+          <li><strong>信息标题：</strong>信息标题，已撤回信息显示「已撤回」标签</li>
           <li><strong>内容摘要：</strong>取该模板前两个表单字段的值进行预览，单个字段值超过 40 字符时截断并显示「...」</li>
           <li><strong>卡片底部：</strong>左侧显示业务分类（📂 图标 + 分类名），右侧显示「★ 取消收藏」按钮（橙色文字）</li>
           <li>点击卡片主体区域跳转到对应来源的详情页；点击「取消收藏」按钮时阻止事件冒泡，仅执行取消收藏操作</li>

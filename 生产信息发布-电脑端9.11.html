@@ -5314,11 +5314,20 @@ function renderDateSettings(id) {
         '<label><input type="radio" name="dt_type_' + id + '"> 年·月·日·时·分·秒</label>' +
       '</div>' +
     '</div>' +
+    '<div class="sp-item"><label>默认日期:</label>' +
+      '<div style="margin-top:4px;">' +
+        '<label class="sp-check"><input type="checkbox"> 系统日期</label>' +
+      '</div>' +
+    '</div>' +
     '<div class="sp-item"><label>提示文字（最多50字符）:</label><input type="text" placeholder="请选择" maxlength="50"></div>';
-  var manualHtml = '<div class="sp-item"><label>默认日期:</label>' +
-      '<div style="margin-top:4px;"><label class="sp-check"><input type="checkbox"> 系统日期</label></div>' +
-    '</div>';
-  var data = buildDataSettingsBlock(id, 'dt', manualHtml);
+  var data =
+  '<div class="sp-item">' +
+    '<label>数据来源：</label>' +
+    '<div class="sp-radio">' +
+      '<label><input type="radio" name="ds_' + id + '" checked> 从数据源获取</label>' +
+    '</div>' +
+  '</div>';
+
   return wrapSettingsTabs('组件设置面板 - 日期', basic, data);
 }
 

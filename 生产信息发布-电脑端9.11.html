@@ -5315,10 +5315,29 @@ function renderDateSettings(id) {
       '</div>' +
     '</div>' +
     '<div class="sp-item"><label>提示文字（最多50字符）:</label><input type="text" placeholder="请选择" maxlength="50"></div>';
-  var manualHtml = '<div class="sp-item"><label>系统日期:</label>' +
-      '<div style="margin-top:4px;"><label class="sp-check"><input type="checkbox"> 系统日期</label></div>' +
-    '</div>';
-  var data = buildDataSettingsBlock(id, 'dt', manualHtml);
+
+  // 数据配置：系统日期 / 从数据源获取（默认选中"从数据源获取"）
+  var data = '<div class="sp-block">' +
+    '<div class="sp-label-row"><span>数据来源</span></div>' +
+    '<div class="sp-radio">' +
+      '<label><input type="radio" name="dt_opt_' + id + '" onchange="toggleDataOpt(this,\'' + id + '\',\'dt\')"> 系统日期</label>' +
+      '<label><input type="radio" name="dt_opt_' + id + '" checked onchange="toggleDataOpt(this,\'' + id + '\',\'dt\')"> 从数据源获取</label>' +
+    '</div>' +
+    '<div id="dt_datasource_' + id + '" class="ds-panel">' +
+      '<div class="sp-block-title">选择数据源</div>' +
+      '<div class="sp-ds-simple-row">' +
+        '<div class="sp-ds-simple-field">' +
+          '<label>接口名称</label>' +
+          dsSelectTriggerHtml() +
+        '</div>' +
+        '<div class="sp-ds-simple-field">' +
+          '<label>响应参数</label>' +
+          '<select><option>选接口后自动填充</option></select>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
   return wrapSettingsTabs('组件设置面板 - 日期', basic, data);
 }
 
